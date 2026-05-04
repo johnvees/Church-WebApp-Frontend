@@ -15,7 +15,7 @@ export default function AboutPage() {
     api.get('/about').then(({ data }) => { if (data.success) setAbout(data.data) }).catch(() => {})
   }, [])
 
-  const churchName = lang === 'en' && about?.churchName_en ? about.churchName_en : (about?.churchName_id || 'GMAHK Ekklesia')
+  const churchName = lang === 'en' && about?.churchName_en ? about.churchName_en : (about?.churchName_id || t('common.churchCopyright'))
   const tagline = lang === 'en' && about?.tagline_en ? about.tagline_en : (about?.tagline_id || '')
   const vision = lang === 'en' && about?.vision_en ? about.vision_en : (about?.vision_id || '')
   const mission = lang === 'en' ? (about?.mission_en || []) : (about?.mission_id || [])

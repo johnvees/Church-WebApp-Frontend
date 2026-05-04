@@ -64,7 +64,7 @@ export default function Navbar() {
                 Ekklesia
               </p>
               <p className={`text-xs leading-none transition-colors ${scrolled ? 'text-gold-500' : 'text-gold-300'}`}>
-                GMAHK
+                {t('common.churchAbbr')}
               </p>
             </div>
           </Link>

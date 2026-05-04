@@ -21,7 +21,7 @@ export default function Footer() {
               </div>
               <div>
                 <p className="font-serif font-bold text-lg">Ekklesia</p>
-                <p className="text-gold-400 text-xs">GMAHK</p>
+                <p className="text-gold-400 text-xs">{t('common.churchAbbr')}</p>
               </div>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed mb-4">
@@ -84,7 +84,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-white/10 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-gray-500 text-xs">© {year} GMAHK Ekklesia. {t('footer.copyright')}</p>
+          <p className="text-gray-500 text-xs">© {year} {t('common.churchCopyright')}. {t('footer.copyright')}</p>
           <Link to="/admin/login" className="text-gray-600 hover:text-gray-400 text-xs transition-colors">
             Admin
           </Link>

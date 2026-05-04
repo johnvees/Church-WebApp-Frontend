@@ -54,7 +54,7 @@ i18n.use(initReactI18next).init({
         articles: 'Artikel', galleryTab: 'Galeri',
         noArticles: 'Belum ada artikel', noGallery: 'Belum ada galeri',
       },
-      common: { loading: 'Memuat...', noData: 'Tidak ada data', back: 'Kembali', save: 'Simpan', cancel: 'Batal', delete: 'Hapus', edit: 'Edit', add: 'Tambah', search: 'Cari' },
+      common: { loading: 'Memuat...', noData: 'Tidak ada data', back: 'Kembali', save: 'Simpan', cancel: 'Batal', delete: 'Hapus', edit: 'Edit', add: 'Tambah', search: 'Cari', churchAbbr: 'GMAHK', churchCopyright: 'GMAHK Ekklesia' },
       about: { title: 'Tentang Kami', vision: 'Visi', mission: 'Misi', history: 'Sejarah', contact: 'Kontak' },
       admin: {
         dashboard: 'Dashboard', login: 'Masuk', logout: 'Keluar',
@@ -143,7 +143,7 @@ i18n.use(initReactI18next).init({
         articlesWillAppear: 'Articles will appear here once published',
         togetherMoments: 'Moments Together', viewAllGallery: 'View All Gallery',
       },
-      hero: { badge: 'GMAHK · Ekklesia Church', knowUs: 'Know Us', activities: 'Activities', scroll: 'Scroll' },
+      hero: { badge: 'SDA · Ekklesia Church', knowUs: 'Know Us', activities: 'Activities', scroll: 'Scroll' },
       footer: {
         description: 'Seventh-day Adventist Church — Ekklesia Congregation. Growing in faith, serving with love.',
         navigation: 'Navigation', contact: 'Contact',
@@ -181,7 +181,7 @@ i18n.use(initReactI18next).init({
         articles: 'Articles', galleryTab: 'Gallery',
         noArticles: 'No articles yet', noGallery: 'No gallery yet',
       },
-      common: { loading: 'Loading...', noData: 'No data', back: 'Back', save: 'Save', cancel: 'Cancel', delete: 'Delete', edit: 'Edit', add: 'Add', search: 'Search' },
+      common: { loading: 'Loading...', noData: 'No data', back: 'Back', save: 'Save', cancel: 'Cancel', delete: 'Delete', edit: 'Edit', add: 'Add', search: 'Search', churchAbbr: 'SDA', churchCopyright: 'SDA Ekklesia' },
       about: { title: 'About Us', vision: 'Vision', mission: 'Mission', history: 'History', contact: 'Contact' },
       admin: {
         dashboard: 'Dashboard', login: 'Login', logout: 'Logout',
