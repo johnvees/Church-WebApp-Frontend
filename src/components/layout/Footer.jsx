@@ -25,7 +25,7 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed mb-4">
-              Gereja Masehi Advent Hari Ketujuh — Jemaat Ekklesia. Bertumbuh dalam iman, melayani dengan kasih.
+              {t('footer.description')}
             </p>
             <div className="flex gap-3">
               {[FiYoutube, FiInstagram, FiFacebook].map((Icon, i) => (
@@ -38,7 +38,7 @@ export default function Footer() {
 
           {/* Links */}
           <div>
-            <p className="font-serif text-gold-400 mb-4 text-sm font-semibold uppercase tracking-wider">Navigasi</p>
+            <p className="font-serif text-gold-400 mb-4 text-sm font-semibold uppercase tracking-wider">{t('footer.navigation')}</p>
             <ul className="space-y-2">
               {[
                 [t('nav.home'), '/'],
@@ -59,11 +59,11 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <p className="font-serif text-gold-400 mb-4 text-sm font-semibold uppercase tracking-wider">Kontak</p>
+            <p className="font-serif text-gold-400 mb-4 text-sm font-semibold uppercase tracking-wider">{t('footer.contact')}</p>
             <ul className="space-y-3">
               <li className="flex items-start gap-3 text-gray-400 text-sm">
                 <FiMapPin size={15} className="mt-0.5 text-gold-500 shrink-0" />
-                <span>Jl. Contoh No. 1, Surabaya, Jawa Timur</span>
+                <span>{t('footer.address')}</span>
               </li>
               <li className="flex items-center gap-3 text-gray-400 text-sm">
                 <FiPhone size={15} className="text-gold-500 shrink-0" />
@@ -76,15 +76,15 @@ export default function Footer() {
             </ul>
             <div className="mt-4 p-3 bg-white/5 rounded-xl border border-white/10">
               <p className="text-xs text-gray-400">
-                <span className="text-gold-400 font-semibold">Jadwal Ibadah:</span><br />
-                Sabtu, 09.00 – 12.00 WIB
+                <span className="text-gold-400 font-semibold">{t('footer.serviceScheduleLabel')}</span><br />
+                {t('footer.serviceScheduleValue')}
               </p>
             </div>
           </div>
         </div>
 
         <div className="border-t border-white/10 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-gray-500 text-xs">© {year} GMAHK Ekklesia. Hak cipta dilindungi.</p>
+          <p className="text-gray-500 text-xs">© {year} GMAHK Ekklesia. {t('footer.copyright')}</p>
           <Link to="/admin/login" className="text-gray-600 hover:text-gray-400 text-xs transition-colors">
             Admin
           </Link>

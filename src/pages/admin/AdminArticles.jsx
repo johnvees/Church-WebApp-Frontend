@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import { FiPlus, FiEdit2, FiTrash2, FiEye, FiArrowLeft, FiSave } from 'react-icons/fi'
 import AdminLayout from '../../components/layout/AdminLayout'
 import api from '../../utils/api'
@@ -8,6 +9,7 @@ import toast from 'react-hot-toast'
 
 // ── List ──────────────────────────────────────────────────────
 export function AdminArticlesList() {
+  const { t } = useTranslation()
   const [articles, setArticles] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -20,24 +22,24 @@ export function AdminArticlesList() {
   useEffect(() => { load() }, [])
 
   const handleDelete = async (id, title) => {
-    if (!window.confirm(`Hapus artikel "${title}"?`)) return
+    if (!window.confirm(`${t('admin.deleteArticleConfirm')} "${title}"?`)) return
     await api.delete(`/articles/${id}`)
-    toast.success('Artikel dihapus')
+    toast.success(t('admin.articleDeleted'))
     load()
   }
 
   const handleTogglePublish = async (article) => {
     await api.put(`/articles/${article._id}`, { isPublished: !article.isPublished })
-    toast.success(article.isPublished ? 'Artikel dijadikan draft' : 'Artikel diterbitkan')
+    toast.success(article.isPublished ? t('admin.articleDrafted') : t('admin.articlePublished'))
     load()
   }
 
   return (
     <AdminLayout>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="font-serif text-2xl font-bold text-navy-700">Artikel</h1>
+        <h1 className="font-serif text-2xl font-bold text-navy-700">{t('activity.articles')}</h1>
         <Link to="/admin/articles/new" className="flex items-center gap-2 bg-gold-500 hover:bg-gold-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all">
-          <FiPlus size={16} /> Tambah Artikel
+          <FiPlus size={16} /> {t('admin.addArticle')}
         </Link>
       </div>
 
@@ -48,18 +50,18 @@ export function AdminArticlesList() {
           </div>
         ) : articles.length === 0 ? (
           <div className="p-12 text-center">
-            <p className="text-gray-400 font-serif text-xl mb-4">Belum ada artikel</p>
+            <p className="text-gray-400 font-serif text-xl mb-4">{t('admin.noArticles')}</p>
             <Link to="/admin/articles/new" className="inline-flex items-center gap-2 bg-gold-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold">
-              <FiPlus size={14} /> Buat Artikel Pertama
+              <FiPlus size={14} /> {t('admin.createFirstArticle')}
             </Link>
           </div>
         ) : (
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Judul</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:table-cell">Status</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Dibaca</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.title')}</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:table-cell">{t('admin.status')}</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">{t('admin.views')}</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
@@ -76,7 +78,7 @@ export function AdminArticlesList() {
                         a.isPublished ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                       }`}
                     >
-                      {a.isPublished ? 'Terbit' : 'Draft'}
+                      {a.isPublished ? t('admin.published') : t('admin.draft')}
                     </button>
                   </td>
                   <td className="px-4 py-3 hidden md:table-cell text-sm text-gray-400">{a.views}</td>
@@ -110,6 +112,7 @@ export function AdminArticlesList() {
 
 // ── Form (Create / Edit) ─────────────────────────────────────
 export function AdminArticleForm() {
+  const { t } = useTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
   const isEdit = !!id
@@ -141,10 +144,10 @@ export function AdminArticleForm() {
       const { data } = await api.post('/articles/upload-image', formData)
       if (data.success) {
         setForm(prev => ({ ...prev, coverImage: data.url }))
-        toast.success('Gambar berhasil diupload')
+        toast.success(t('admin.imageUploaded'))
       }
     } catch {
-      toast.error('Gagal upload gambar')
+      toast.error(t('admin.uploadFailed'))
     } finally {
       setUploading(false)
     }
@@ -160,14 +163,14 @@ export function AdminArticleForm() {
     try {
       if (isEdit) {
         await api.put(`/articles/${id}`, payload)
-        toast.success('Artikel berhasil diperbarui')
+        toast.success(t('admin.articleUpdated'))
       } else {
         await api.post('/articles', payload)
-        toast.success('Artikel berhasil dibuat')
+        toast.success(t('admin.articleCreated'))
       }
       navigate('/admin/articles')
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Gagal menyimpan')
+      toast.error(err.response?.data?.message || t('admin.saveFailed'))
     } finally {
       setSaving(false)
     }
@@ -183,7 +186,7 @@ export function AdminArticleForm() {
           <FiArrowLeft size={18} className="text-gray-500" />
         </Link>
         <h1 className="font-serif text-2xl font-bold text-navy-700">
-          {isEdit ? 'Edit Artikel' : 'Artikel Baru'}
+          {isEdit ? t('admin.editArticle') : t('admin.newArticle')}
         </h1>
       </div>
 
@@ -194,31 +197,31 @@ export function AdminArticleForm() {
             <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className={lbl}>Judul (Indonesia) *</label>
+                  <label className={lbl}>{t('admin.titleId')} *</label>
                   <input className={inp} required value={form.title_id} onChange={e => setForm({...form, title_id: e.target.value})} placeholder="Judul artikel..." />
                 </div>
                 <div>
-                  <label className={lbl}>Title (English)</label>
+                  <label className={lbl}>{t('admin.titleEn')}</label>
                   <input className={inp} value={form.title_en} onChange={e => setForm({...form, title_en: e.target.value})} placeholder="Article title..." />
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className={lbl}>Ringkasan (ID)</label>
+                  <label className={lbl}>{t('admin.excerptId')}</label>
                   <textarea className={inp} rows={3} value={form.excerpt_id} onChange={e => setForm({...form, excerpt_id: e.target.value})} placeholder="Ringkasan singkat..." />
                 </div>
                 <div>
-                  <label className={lbl}>Excerpt (EN)</label>
+                  <label className={lbl}>{t('admin.excerptEn')}</label>
                   <textarea className={inp} rows={3} value={form.excerpt_en} onChange={e => setForm({...form, excerpt_en: e.target.value})} placeholder="Short excerpt..." />
                 </div>
               </div>
               <div>
-                <label className={lbl}>Konten (Bahasa Indonesia) *</label>
-                <textarea className={inp} rows={10} required value={form.content_id} onChange={e => setForm({...form, content_id: e.target.value})} placeholder="Tulis konten artikel di sini... (mendukung HTML dasar)" />
-                <p className="text-xs text-gray-400 mt-1">Mendukung tag HTML seperti &lt;b&gt;, &lt;i&gt;, &lt;p&gt;, &lt;h2&gt;, dll.</p>
+                <label className={lbl}>{t('admin.contentId')} *</label>
+                <textarea className={inp} rows={10} required value={form.content_id} onChange={e => setForm({...form, content_id: e.target.value})} placeholder={t('admin.writeContentHere')} />
+                <p className="text-xs text-gray-400 mt-1">{t('admin.htmlSupport')} &lt;b&gt;, &lt;i&gt;, &lt;p&gt;, &lt;h2&gt;, etc.</p>
               </div>
               <div>
-                <label className={lbl}>Content (English)</label>
+                <label className={lbl}>{t('admin.contentEn')}</label>
                 <textarea className={inp} rows={10} value={form.content_en} onChange={e => setForm({...form, content_en: e.target.value})} placeholder="Write article content here..." />
               </div>
             </div>
@@ -228,32 +231,32 @@ export function AdminArticleForm() {
           <div className="space-y-4">
             {/* Publish */}
             <div className="bg-white rounded-2xl border border-gray-100 p-5">
-              <h3 className="font-semibold text-sm text-navy-700 mb-4">Pengaturan</h3>
+              <h3 className="font-semibold text-sm text-navy-700 mb-4">{t('admin.settings')}</h3>
               <div className="space-y-3">
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input type="checkbox" className="w-4 h-4 accent-gold-500" checked={form.isPublished} onChange={e => setForm({...form, isPublished: e.target.checked})} />
-                  <span className="text-sm text-gray-600">Terbitkan artikel</span>
+                  <span className="text-sm text-gray-600">{t('admin.publishArticle')}</span>
                 </label>
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input type="checkbox" className="w-4 h-4 accent-gold-500" checked={form.isFeatured} onChange={e => setForm({...form, isFeatured: e.target.checked})} />
-                  <span className="text-sm text-gray-600">Tampilkan di featured</span>
+                  <span className="text-sm text-gray-600">{t('admin.showFeatured')}</span>
                 </label>
               </div>
               <button type="submit" disabled={saving}
                 className="w-full mt-5 flex items-center justify-center gap-2 bg-gold-500 hover:bg-gold-600 disabled:opacity-60 text-white font-semibold py-2.5 rounded-xl transition-all text-sm">
-                <FiSave size={15} /> {saving ? 'Menyimpan...' : 'Simpan'}
+                <FiSave size={15} /> {saving ? t('admin.saving') : t('common.save')}
               </button>
             </div>
 
             {/* Cover image */}
             <div className="bg-white rounded-2xl border border-gray-100 p-5">
-              <h3 className="font-semibold text-sm text-navy-700 mb-3">Foto Cover</h3>
+              <h3 className="font-semibold text-sm text-navy-700 mb-3">{t('admin.coverPhoto')}</h3>
               {form.coverImage && (
                 <img src={form.coverImage} alt="cover" className="w-full rounded-xl object-cover aspect-video mb-3" />
               )}
               <label className="flex items-center justify-center gap-2 border-2 border-dashed border-gray-200 hover:border-gold-400 rounded-xl p-4 cursor-pointer transition-colors">
                 <input type="file" accept="image/*" className="hidden" onChange={handleUpload} />
-                <span className="text-sm text-gray-500">{uploading ? 'Mengupload...' : 'Pilih gambar'}</span>
+                <span className="text-sm text-gray-500">{uploading ? t('admin.uploading') : t('admin.selectImage')}</span>
               </label>
             </div>
 
@@ -261,7 +264,7 @@ export function AdminArticleForm() {
             <div className="bg-white rounded-2xl border border-gray-100 p-5">
               <label className={lbl}>Tags</label>
               <input className={inp} value={form.tags} onChange={e => setForm({...form, tags: e.target.value})} placeholder="ibadah, kegiatan, rohani" />
-              <p className="text-xs text-gray-400 mt-1">Pisahkan dengan koma</p>
+              <p className="text-xs text-gray-400 mt-1">{t('admin.separateWithComma')}</p>
             </div>
           </div>
         </div>

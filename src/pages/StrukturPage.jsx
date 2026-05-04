@@ -7,6 +7,10 @@ import SectionReveal from '../components/ui/SectionReveal'
 import api from '../utils/api'
 
 function MemberCard({ member, delay = 0 }) {
+  const lang = localStorage.getItem('lang') || 'id'
+  const position = lang === 'en' && member.position_en ? member.position_en : member.position_id
+  const department = lang === 'en' && member.department_en ? member.department_en : member.department_id
+
   return (
     <SectionReveal delay={delay}>
       <motion.div
@@ -21,8 +25,8 @@ function MemberCard({ member, delay = 0 }) {
           </div>
         )}
         <h3 className="font-serif font-semibold text-navy-700 text-base">{member.name}</h3>
-        <p className="text-gold-500 text-xs font-semibold mt-1 mb-1">{member.position_id}</p>
-        {member.department_id && <p className="text-gray-400 text-xs mb-2">{member.department_id}</p>}
+        <p className="text-gold-500 text-xs font-semibold mt-1 mb-1">{position}</p>
+        {department && <p className="text-gray-400 text-xs mb-2">{department}</p>}
         {member.period && <p className="text-gray-300 text-xs">{member.period}</p>}
         <div className="flex justify-center gap-2 mt-3">
           {member.email && (
@@ -68,7 +72,7 @@ export default function StrukturPage() {
         }} />
         <div className="relative">
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-gold-400 text-sm font-semibold uppercase tracking-widest mb-3">
-            Kepemimpinan Jemaat
+            {t('struktur.subtitle')}
           </motion.p>
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="font-serif text-4xl sm:text-5xl font-bold text-white mb-4">
             {t('nav.struktur')}
@@ -87,8 +91,8 @@ export default function StrukturPage() {
             </div>
           ) : members.length === 0 ? (
             <div className="text-center py-20">
-              <p className="font-serif text-3xl text-gray-300 mb-3">Belum ada data</p>
-              <p className="text-gray-400 text-sm">Struktur organisasi akan ditampilkan di sini</p>
+              <p className="font-serif text-3xl text-gray-300 mb-3">{t('struktur.noData')}</p>
+              <p className="text-gray-400 text-sm">{t('struktur.orgWillAppear')}</p>
             </div>
           ) : (
             <div className="space-y-12">
@@ -96,7 +100,7 @@ export default function StrukturPage() {
               {level1.length > 0 && (
                 <div>
                   <SectionReveal className="text-center mb-6">
-                    <span className="inline-block bg-gold-100 text-gold-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest">Pimpinan</span>
+                    <span className="inline-block bg-gold-100 text-gold-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest">{t('struktur.leader')}</span>
                   </SectionReveal>
                   <div className="flex flex-wrap justify-center gap-5 max-w-lg mx-auto">
                     {level1.map((m, i) => <MemberCard key={m._id} member={m} delay={i * 0.1} />)}
@@ -115,7 +119,7 @@ export default function StrukturPage() {
               {level2.length > 0 && (
                 <div>
                   <SectionReveal className="text-center mb-6">
-                    <span className="inline-block bg-navy-100 text-navy-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest">Majelis</span>
+                    <span className="inline-block bg-navy-100 text-navy-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest">{t('struktur.council')}</span>
                   </SectionReveal>
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
                     {level2.map((m, i) => <MemberCard key={m._id} member={m} delay={i * 0.07} />)}
@@ -127,7 +131,7 @@ export default function StrukturPage() {
               {level3.length > 0 && (
                 <div>
                   <SectionReveal className="text-center mb-6">
-                    <span className="inline-block bg-gray-100 text-gray-600 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest">Departemen</span>
+                    <span className="inline-block bg-gray-100 text-gray-600 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest">{t('struktur.department')}</span>
                   </SectionReveal>
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                     {level3.map((m, i) => <MemberCard key={m._id} member={m} delay={i * 0.05} />)}

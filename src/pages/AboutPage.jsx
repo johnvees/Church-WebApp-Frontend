@@ -20,7 +20,7 @@ export default function AboutPage() {
   const vision = lang === 'en' && about?.vision_en ? about.vision_en : (about?.vision_id || '')
   const mission = lang === 'en' ? (about?.mission_en || []) : (about?.mission_id || [])
   const history = lang === 'en' && about?.history_en ? about.history_en : (about?.history_id || '')
-  const schedule = lang === 'en' && about?.serviceSchedule_en ? about.serviceSchedule_en : (about?.serviceSchedule_id || 'Sabtu, 09.00 – 12.00 WIB')
+  const schedule = lang === 'en' && about?.serviceSchedule_en ? about.serviceSchedule_en : (about?.serviceSchedule_id || t('footer.serviceScheduleValue'))
 
   return (
     <Layout>
@@ -56,7 +56,7 @@ export default function AboutPage() {
                 </div>
                 <h2 className="font-serif text-2xl font-bold text-navy-700 mb-4">{t('about.vision')}</h2>
                 <div className="w-10 h-0.5 bg-gold-400 mb-4" />
-                <p className="text-gray-600 leading-relaxed">{vision || 'Visi jemaat akan ditampilkan di sini.'}</p>
+                <p className="text-gray-600 leading-relaxed">{vision || t('aboutPage.visionPlaceholder')}</p>
               </div>
             </SectionReveal>
 
@@ -78,7 +78,7 @@ export default function AboutPage() {
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-gray-400">Misi jemaat akan ditampilkan di sini.</p>
+                  <p className="text-gray-400">{t('aboutPage.missionPlaceholder')}</p>
                 )}
               </div>
             </SectionReveal>
@@ -91,7 +91,7 @@ export default function AboutPage() {
         <section className="py-20 bg-white">
           <div className="max-w-3xl mx-auto px-4">
             <SectionReveal className="text-center mb-10">
-              <p className="text-gold-500 text-sm font-semibold uppercase tracking-widest mb-3">Perjalanan Kami</p>
+              <p className="text-gold-500 text-sm font-semibold uppercase tracking-widest mb-3">{t('aboutPage.ourJourney')}</p>
               <h2 className="font-serif text-3xl sm:text-4xl font-bold text-navy-700">{t('about.history')}</h2>
               <div className="gold-divider mx-auto mt-4" />
             </SectionReveal>
@@ -120,11 +120,11 @@ export default function AboutPage() {
                 <div className="w-10 h-10 bg-gold-500/20 rounded-xl flex items-center justify-center mb-4">
                   <FiMapPin className="text-gold-400" size={18} />
                 </div>
-                <p className="text-gold-400 text-xs font-semibold uppercase tracking-widest mb-2">Alamat</p>
-                <p className="text-white/80 text-sm leading-relaxed">{about?.address || 'Alamat belum diisi'}</p>
+                <p className="text-gold-400 text-xs font-semibold uppercase tracking-widest mb-2">{t('aboutPage.addressLabel')}</p>
+                <p className="text-white/80 text-sm leading-relaxed">{about?.address || t('aboutPage.addressPlaceholder')}</p>
                 {about?.googleMapsUrl && (
                   <a href={about.googleMapsUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-gold-400 text-xs mt-3 hover:text-gold-300 transition-colors">
-                    Buka di Maps →
+                    {t('aboutPage.openInMaps')}
                   </a>
                 )}
               </div>
@@ -136,7 +136,7 @@ export default function AboutPage() {
                 <div className="w-10 h-10 bg-gold-500/20 rounded-xl flex items-center justify-center mb-4">
                   <FiPhone className="text-gold-400" size={18} />
                 </div>
-                <p className="text-gold-400 text-xs font-semibold uppercase tracking-widest mb-3">Kontak</p>
+                <p className="text-gold-400 text-xs font-semibold uppercase tracking-widest mb-3">{t('aboutPage.contactLabel')}</p>
                 <div className="space-y-2">
                   {about?.phone && (
                     <a href={`tel:${about.phone}`} className="flex items-center gap-2 text-white/80 hover:text-white text-sm transition-colors">
@@ -158,9 +158,9 @@ export default function AboutPage() {
                 <div className="w-10 h-10 bg-gold-500/20 rounded-xl flex items-center justify-center mb-4">
                   <span className="text-gold-400 text-lg">⛪</span>
                 </div>
-                <p className="text-gold-400 text-xs font-semibold uppercase tracking-widest mb-2">Jadwal Ibadah</p>
+                <p className="text-gold-400 text-xs font-semibold uppercase tracking-widest mb-2">{t('aboutPage.serviceSchedule')}</p>
                 <p className="text-white/80 text-sm mb-5">{schedule}</p>
-                <p className="text-gold-400 text-xs font-semibold uppercase tracking-widest mb-3">Media Sosial</p>
+                <p className="text-gold-400 text-xs font-semibold uppercase tracking-widest mb-3">{t('aboutPage.socialMedia')}</p>
                 <div className="flex gap-3">
                   {about?.socialMedia?.youtube && (
                     <a href={about.socialMedia.youtube} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full border border-white/20 flex items-center justify-center text-white/60 hover:border-gold-400 hover:text-gold-400 transition-colors">

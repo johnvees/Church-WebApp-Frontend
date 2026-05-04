@@ -7,9 +7,12 @@ import Layout from '../components/layout/Layout'
 import SectionReveal from '../components/ui/SectionReveal'
 import api from '../utils/api'
 import { format } from 'date-fns'
-import { id } from 'date-fns/locale'
+import { id as idLocale, enUS } from 'date-fns/locale'
 
 function Lightbox({ photo, onClose }) {
+  const lang = localStorage.getItem('lang') || 'id'
+  const caption = lang === 'en' && photo.caption_en ? photo.caption_en : photo.caption_id
+
   return (
     <AnimatePresence>
       <motion.div
@@ -30,7 +33,7 @@ function Lightbox({ photo, onClose }) {
           <button onClick={onClose} className="absolute top-4 right-4 w-10 h-10 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/80 transition-colors">
             <FiX size={18} />
           </button>
-          {photo.caption_id && <p className="text-white/80 text-center text-sm mt-3">{photo.caption_id}</p>}
+          {caption && <p className="text-white/80 text-center text-sm mt-3">{caption}</p>}
         </motion.div>
       </motion.div>
     </AnimatePresence>
@@ -46,6 +49,12 @@ export default function ActivityPage() {
   const [activeGallery, setActiveGallery] = useState(null)
   const [lightbox, setLightbox] = useState(null)
   const [loading, setLoading] = useState(true)
+  const dateLocale = lang === 'en' ? enUS : idLocale
+
+  const tabs = [
+    { key: 'artikel', label: t('activity.articles') },
+    { key: 'galeri', label: t('activity.galleryTab') },
+  ]
 
   useEffect(() => {
     Promise.all([
@@ -84,7 +93,7 @@ export default function ActivityPage() {
               onClick={e => e.stopPropagation()}
             >
               <div className="p-6 border-b flex items-center justify-between">
-                <h3 className="font-serif text-xl font-semibold text-navy-700">{activeGallery.title_id}</h3>
+                <h3 className="font-serif text-xl font-semibold text-navy-700">{lang === 'en' && activeGallery.title_en ? activeGallery.title_en : activeGallery.title_id}</h3>
                 <button onClick={() => setActiveGallery(null)} className="w-8 h-8 rounded-full border flex items-center justify-center text-gray-400 hover:bg-gray-100">
                   <FiX size={16} />
                 </button>
@@ -120,15 +129,15 @@ export default function ActivityPage() {
 
           {/* Tabs */}
           <div className="flex justify-center gap-2 mt-6">
-            {['artikel', 'galeri'].map(t2 => (
+            {tabs.map(tabItem => (
               <button
-                key={t2}
-                onClick={() => setTab(t2)}
-                className={`px-6 py-2.5 rounded-full font-semibold text-sm capitalize transition-all ${
-                  tab === t2 ? 'bg-gold-500 text-white shadow-lg' : 'bg-white/15 text-white hover:bg-white/25'
+                key={tabItem.key}
+                onClick={() => setTab(tabItem.key)}
+                className={`px-6 py-2.5 rounded-full font-semibold text-sm transition-all ${
+                  tab === tabItem.key ? 'bg-gold-500 text-white shadow-lg' : 'bg-white/15 text-white hover:bg-white/25'
                 }`}
               >
-                {t2.charAt(0).toUpperCase() + t2.slice(1)}
+                {tabItem.label}
               </button>
             ))}
           </div>
@@ -159,7 +168,7 @@ export default function ActivityPage() {
                         )}
                         <div className="p-5">
                           <div className="flex items-center gap-3 text-xs text-gray-400 mb-2">
-                            <span className="flex items-center gap-1"><FiCalendar size={11} />{article.publishedAt ? format(new Date(article.publishedAt), 'd MMM yyyy', { locale: id }) : ''}</span>
+                            <span className="flex items-center gap-1"><FiCalendar size={11} />{article.publishedAt ? format(new Date(article.publishedAt), 'd MMM yyyy', { locale: dateLocale }) : ''}</span>
                             <span className="flex items-center gap-1"><FiEye size={11} /> {article.views}</span>
                           </div>
                           <h3 className="font-serif font-semibold text-navy-700 leading-snug mb-2 hover:text-gold-600 transition-colors line-clamp-2">
@@ -171,7 +180,7 @@ export default function ActivityPage() {
                   </SectionReveal>
                 ))}
               </div>
-            ) : <p className="text-center text-gray-400 py-20 font-serif text-xl">Belum ada artikel</p>
+            ) : <p className="text-center text-gray-400 py-20 font-serif text-xl">{t('activity.noArticles')}</p>
           ) : (
             galleries.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -192,10 +201,10 @@ export default function ActivityPage() {
                         )}
                       </div>
                       <div className="p-4">
-                        <h3 className="font-serif font-semibold text-navy-700">{gallery.title_id}</h3>
+                        <h3 className="font-serif font-semibold text-navy-700">{lang === 'en' && gallery.title_en ? gallery.title_en : gallery.title_id}</h3>
                         {gallery.eventDate && (
                           <p className="text-gray-400 text-xs mt-1 flex items-center gap-1">
-                            <FiCalendar size={11} /> {format(new Date(gallery.eventDate), 'd MMMM yyyy', { locale: id })}
+                            <FiCalendar size={11} /> {format(new Date(gallery.eventDate), 'd MMMM yyyy', { locale: dateLocale })}
                           </p>
                         )}
                       </div>
@@ -203,7 +212,7 @@ export default function ActivityPage() {
                   </SectionReveal>
                 ))}
               </div>
-            ) : <p className="text-center text-gray-400 py-20 font-serif text-xl">Belum ada galeri</p>
+            ) : <p className="text-center text-gray-400 py-20 font-serif text-xl">{t('activity.noGallery')}</p>
           )}
         </div>
       </section>

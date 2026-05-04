@@ -9,7 +9,7 @@ import HeroSection from '../components/sections/HeroSection'
 import SectionReveal from '../components/ui/SectionReveal'
 import api from '../utils/api'
 import { format } from 'date-fns'
-import { id } from 'date-fns/locale'
+import { id as idLocale, enUS } from 'date-fns/locale'
 
 const BACAAN_CARDS = [
   { key: 'beritaMisi', path: '/bacaan/berita-misi', icon: '📰', color: 'from-blue-500 to-blue-700' },
@@ -25,6 +25,7 @@ function ArticleCard({ article }) {
   const lang = localStorage.getItem('lang') || 'id'
   const title = lang === 'en' && article.title_en ? article.title_en : article.title_id
   const excerpt = lang === 'en' && article.excerpt_en ? article.excerpt_en : article.excerpt_id
+  const dateLocale = lang === 'en' ? enUS : idLocale
 
   return (
     <Link to={`/activity/artikel/${article.slug}`} className="group block">
@@ -45,7 +46,7 @@ function ArticleCard({ article }) {
           <div className="flex items-center gap-3 text-xs text-gray-400 mb-2">
             <span className="flex items-center gap-1">
               <FiCalendar size={11} />
-              {article.publishedAt ? format(new Date(article.publishedAt), 'd MMM yyyy', { locale: id }) : ''}
+              {article.publishedAt ? format(new Date(article.publishedAt), 'd MMM yyyy', { locale: dateLocale }) : ''}
             </span>
             <span className="flex items-center gap-1">
               <FiEye size={11} /> {article.views || 0}
@@ -65,6 +66,7 @@ export default function HomePage() {
   const { t } = useTranslation()
   const [articles, setArticles] = useState([])
   const [gallery, setGallery] = useState([])
+  const lang = localStorage.getItem('lang') || 'id'
 
   useEffect(() => {
     api.get('/articles?limit=3').then(({ data }) => {
@@ -83,7 +85,7 @@ export default function HomePage() {
       <section className="py-20 bg-cream">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionReveal className="text-center mb-12">
-            <p className="text-gold-500 text-sm font-semibold uppercase tracking-widest mb-3">Sumber Kerohanian</p>
+            <p className="text-gold-500 text-sm font-semibold uppercase tracking-widest mb-3">{t('home.spiritualResources')}</p>
             <h2 className="font-serif text-3xl sm:text-4xl text-navy-700 font-bold">{t('nav.bacaan')}</h2>
             <div className="gold-divider mx-auto mt-4" />
           </SectionReveal>
@@ -133,13 +135,13 @@ export default function HomePage() {
         <div className="relative max-w-7xl mx-auto px-4 text-center">
           <SectionReveal>
             <p className="text-gold-400 text-sm font-semibold uppercase tracking-widest mb-3">{t('home.serviceTime')}</p>
-            <h2 className="font-serif text-3xl sm:text-4xl text-white font-bold mb-2">Setiap Hari Sabtu</h2>
-            <p className="text-white/70 text-xl font-light">09.00 – 12.00 WIB</p>
+            <h2 className="font-serif text-3xl sm:text-4xl text-white font-bold mb-2">{t('home.everySaturday')}</h2>
+            <p className="text-white/70 text-xl font-light">{t('home.serviceHours')}</p>
             <Link
               to="/about"
               className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-gold-500 hover:bg-gold-600 text-white rounded-full font-semibold text-sm transition-all hover:scale-105"
             >
-              Lihat Lokasi <FiArrowRight size={15} />
+              {t('home.viewLocation')} <FiArrowRight size={15} />
             </Link>
           </SectionReveal>
         </div>
@@ -150,7 +152,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionReveal className="flex items-end justify-between mb-10">
             <div>
-              <p className="text-gold-500 text-sm font-semibold uppercase tracking-widest mb-2">Blog</p>
+              <p className="text-gold-500 text-sm font-semibold uppercase tracking-widest mb-2">{t('home.blog')}</p>
               <h2 className="font-serif text-3xl sm:text-4xl text-navy-700 font-bold">{t('home.latestArticles')}</h2>
             </div>
             <Link to="/activity" className="flex items-center gap-2 text-sm text-gold-600 hover:text-gold-700 font-semibold transition-colors">
@@ -168,8 +170,8 @@ export default function HomePage() {
             </div>
           ) : (
             <div className="text-center py-16 text-gray-400">
-              <p className="font-serif text-2xl mb-2">Belum ada artikel</p>
-              <p className="text-sm">Artikel akan muncul di sini setelah dipublikasikan</p>
+              <p className="font-serif text-2xl mb-2">{t('home.noArticles')}</p>
+              <p className="text-sm">{t('home.articlesWillAppear')}</p>
             </div>
           )}
         </div>
@@ -180,7 +182,7 @@ export default function HomePage() {
         <section className="py-20 bg-cream">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <SectionReveal className="text-center mb-10">
-              <p className="text-gold-500 text-sm font-semibold uppercase tracking-widest mb-2">Momen Bersama</p>
+              <p className="text-gold-500 text-sm font-semibold uppercase tracking-widest mb-2">{t('home.togetherMoments')}</p>
               <h2 className="font-serif text-3xl sm:text-4xl text-navy-700 font-bold">{t('home.gallery')}</h2>
               <div className="gold-divider mx-auto mt-4" />
             </SectionReveal>
@@ -193,14 +195,14 @@ export default function HomePage() {
                       className="relative aspect-square rounded-2xl overflow-hidden bg-navy-800"
                     >
                       {item.coverImage ? (
-                        <img src={item.coverImage} alt={item.title_id} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                        <img src={item.coverImage} alt={lang === 'en' && item.title_en ? item.title_en : item.title_id} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-navy-700 to-navy-900">
                           <span className="font-serif text-4xl text-gold-400">E</span>
                         </div>
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-navy-900/60 to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-end p-3">
-                        <p className="text-white text-xs font-medium truncate">{item.title_id}</p>
+                        <p className="text-white text-xs font-medium truncate">{lang === 'en' && item.title_en ? item.title_en : item.title_id}</p>
                       </div>
                     </motion.div>
                   </Link>
@@ -212,7 +214,7 @@ export default function HomePage() {
                 to="/activity"
                 className="inline-flex items-center gap-2 px-6 py-3 border-2 border-navy-700 text-navy-700 hover:bg-navy-700 hover:text-white rounded-full font-semibold text-sm transition-all"
               >
-                {t('home.viewAll')} Galeri <FiArrowRight size={14} />
+                {t('home.viewAllGallery')} <FiArrowRight size={14} />
               </Link>
             </div>
           </div>

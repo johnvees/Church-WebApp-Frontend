@@ -6,7 +6,7 @@ import { FiArrowLeft, FiCalendar, FiEye, FiDownload, FiExternalLink } from 'reac
 import Layout from '../components/layout/Layout'
 import api from '../utils/api'
 import { format } from 'date-fns'
-import { id } from 'date-fns/locale'
+import { id as idLocale, enUS } from 'date-fns/locale'
 
 const BACAAN_KEYS = {
   'berita-misi': 'beritaMisi', 'sekolah-sabat': 'sekolahSabat',
@@ -20,6 +20,7 @@ export default function BacaanDetailPage() {
   const lang = localStorage.getItem('lang') || 'id'
   const [item, setItem] = useState(null)
   const [loading, setLoading] = useState(true)
+  const dateLocale = lang === 'en' ? enUS : idLocale
 
   useEffect(() => {
     api.get(`/bacaan/${slug}`)
@@ -39,8 +40,8 @@ export default function BacaanDetailPage() {
     <Layout>
       <div className="min-h-screen flex items-center justify-center text-center">
         <div>
-          <p className="font-serif text-3xl text-gray-300 mb-4">Konten tidak ditemukan</p>
-          <Link to={`/bacaan/${category}`} className="text-gold-600 hover:underline">← Kembali</Link>
+          <p className="font-serif text-3xl text-gray-300 mb-4">{t('bacaanDetail.notFound')}</p>
+          <Link to={`/bacaan/${category}`} className="text-gold-600 hover:underline">{t('bacaanDetail.back')}</Link>
         </div>
       </div>
     </Layout>
@@ -68,11 +69,11 @@ export default function BacaanDetailPage() {
             {item.publishedAt && (
               <span className="flex items-center gap-1.5">
                 <FiCalendar size={13} />
-                {format(new Date(item.publishedAt), 'd MMMM yyyy', { locale: id })}
+                {format(new Date(item.publishedAt), 'd MMMM yyyy', { locale: dateLocale })}
               </span>
             )}
             <span className="flex items-center gap-1.5">
-              <FiEye size={13} /> {item.views} kali dibaca
+              <FiEye size={13} /> {item.views} {t('bacaanDetail.timesRead')}
             </span>
           </div>
         </div>
@@ -103,8 +104,8 @@ export default function BacaanDetailPage() {
                 <FiDownload className="text-white" size={18} />
               </div>
               <div>
-                <p className="font-semibold text-navy-700 text-sm group-hover:text-gold-600 transition-colors">Unduh Dokumen</p>
-                <p className="text-gray-400 text-xs">Klik untuk membuka atau mengunduh file</p>
+                <p className="font-semibold text-navy-700 text-sm group-hover:text-gold-600 transition-colors">{t('bacaanDetail.downloadDocument')}</p>
+                <p className="text-gray-400 text-xs">{t('bacaanDetail.clickToDownload')}</p>
               </div>
             </a>
           )}
@@ -118,7 +119,7 @@ export default function BacaanDetailPage() {
               className="flex items-center gap-3 mb-8 p-4 bg-blue-50 rounded-xl border border-blue-200 hover:border-blue-400 transition-colors group"
             >
               <FiExternalLink className="text-blue-500" size={20} />
-              <span className="text-blue-700 font-semibold text-sm group-hover:underline">Buka Tautan Eksternal</span>
+              <span className="text-blue-700 font-semibold text-sm group-hover:underline">{t('bacaanDetail.openExternalLink')}</span>
             </a>
           )}
 
@@ -129,7 +130,7 @@ export default function BacaanDetailPage() {
               dangerouslySetInnerHTML={{ __html: content }}
             />
           ) : (
-            <p className="text-gray-400 text-center py-12 font-serif text-xl">Konten belum tersedia.</p>
+            <p className="text-gray-400 text-center py-12 font-serif text-xl">{t('bacaanDetail.contentNotAvailable')}</p>
           )}
         </div>
       </article>

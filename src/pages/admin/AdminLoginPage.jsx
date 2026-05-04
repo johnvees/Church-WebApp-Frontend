@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../context/AuthContext'
 import toast from 'react-hot-toast'
 
 export default function AdminLoginPage() {
+  const { t } = useTranslation()
   const { login, loading } = useAuth()
   const navigate = useNavigate()
   const [form, setForm] = useState({ email: '', password: '' })
@@ -15,7 +17,7 @@ export default function AdminLoginPage() {
     e.preventDefault()
     const result = await login(form.email, form.password)
     if (result.success) {
-      toast.success('Selamat datang!')
+      toast.success(t('admin.welcome'))
       navigate('/admin/dashboard')
     } else {
       toast.error(result.message)
@@ -48,7 +50,7 @@ export default function AdminLoginPage() {
 
         {/* Card */}
         <div className="bg-white/8 backdrop-blur-md border border-white/15 rounded-3xl p-8">
-          <h2 className="font-serif text-xl font-semibold text-white mb-6">Masuk ke Dashboard</h2>
+          <h2 className="font-serif text-xl font-semibold text-white mb-6">{t('admin.loginTitle')}</h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -91,7 +93,7 @@ export default function AdminLoginPage() {
               whileTap={{ scale: 0.98 }}
               className="w-full bg-gold-500 hover:bg-gold-600 text-white font-semibold py-3.5 rounded-xl transition-all mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {loading ? 'Memproses...' : 'Masuk'}
+              {loading ? t('admin.processing') : t('admin.login')}
             </motion.button>
           </form>
         </div>

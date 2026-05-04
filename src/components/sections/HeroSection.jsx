@@ -66,7 +66,7 @@ export default function HeroSection() {
           className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-8"
         >
           <span className="w-2 h-2 rounded-full bg-gold-400 animate-pulse" />
-          <span className="text-white/80 text-xs font-medium tracking-widest uppercase">GMAHK · Gereja Ekklesia</span>
+          <span className="text-white/80 text-xs font-medium tracking-widest uppercase">{t('hero.badge')}</span>
         </motion.div>
 
         {/* Main title */}
@@ -121,13 +121,13 @@ export default function HeroSection() {
             to="/about"
             className="px-8 py-3.5 bg-gold-500 hover:bg-gold-600 text-white font-semibold rounded-full transition-all duration-300 shadow-lg shadow-gold-500/30 hover:shadow-gold-500/50 hover:scale-105 text-sm"
           >
-            Kenali Kami
+            {t('hero.knowUs')}
           </Link>
           <Link
             to="/activity"
             className="px-8 py-3.5 border border-white/30 hover:border-white/60 text-white hover:bg-white/10 font-semibold rounded-full transition-all duration-300 text-sm"
           >
-            Kegiatan
+            {t('hero.activities')}
           </Link>
         </motion.div>
       </motion.div>
@@ -139,7 +139,7 @@ export default function HeroSection() {
         transition={{ delay: 1.5 }}
         className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
       >
-        <span className="text-white/40 text-xs tracking-widest uppercase">Scroll</span>
+        <span className="text-white/40 text-xs tracking-widest uppercase">{t('hero.scroll')}</span>
         <motion.div
           animate={{ y: [0, 8, 0] }}
           transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}

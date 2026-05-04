@@ -6,7 +6,7 @@ import { FiArrowLeft, FiCalendar, FiEye, FiUser } from 'react-icons/fi'
 import Layout from '../components/layout/Layout'
 import api from '../utils/api'
 import { format } from 'date-fns'
-import { id } from 'date-fns/locale'
+import { id as idLocale, enUS } from 'date-fns/locale'
 
 export default function ArticleDetailPage() {
   const { slug } = useParams()
@@ -14,6 +14,7 @@ export default function ArticleDetailPage() {
   const lang = localStorage.getItem('lang') || 'id'
   const [article, setArticle] = useState(null)
   const [loading, setLoading] = useState(true)
+  const dateLocale = lang === 'en' ? enUS : idLocale
 
   useEffect(() => {
     api.get(`/articles/${slug}`)
@@ -33,8 +34,8 @@ export default function ArticleDetailPage() {
     <Layout>
       <div className="min-h-screen flex items-center justify-center text-center">
         <div>
-          <p className="font-serif text-3xl text-gray-300 mb-4">Artikel tidak ditemukan</p>
-          <Link to="/activity" className="text-gold-600 hover:underline">← Kembali ke Kegiatan</Link>
+          <p className="font-serif text-3xl text-gray-300 mb-4">{t('articleDetail.notFound')}</p>
+          <Link to="/activity" className="text-gold-600 hover:underline">← {t('articleDetail.backToActivity')}</Link>
         </div>
       </div>
     </Layout>
@@ -59,7 +60,7 @@ export default function ArticleDetailPage() {
           <div className="absolute inset-0 bg-gradient-to-t from-navy-900/70 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-6 max-w-3xl mx-auto">
             <Link to="/activity" className="inline-flex items-center gap-2 text-white/70 hover:text-white text-sm mb-4 transition-colors">
-              <FiArrowLeft size={14} /> Kegiatan
+              <FiArrowLeft size={14} /> {t('nav.activity')}
             </Link>
             <h1 className="font-serif text-3xl sm:text-4xl font-bold text-white leading-tight">{title}</h1>
           </div>
@@ -71,7 +72,7 @@ export default function ArticleDetailPage() {
           {!article.coverImage && (
             <>
               <Link to="/activity" className="inline-flex items-center gap-2 text-gray-400 hover:text-gold-600 text-sm mb-6 transition-colors">
-                <FiArrowLeft size={14} /> Kegiatan
+                <FiArrowLeft size={14} /> {t('nav.activity')}
               </Link>
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
@@ -93,11 +94,11 @@ export default function ArticleDetailPage() {
             {article.publishedAt && (
               <span className="flex items-center gap-1.5">
                 <FiCalendar size={13} className="text-gold-500" />
-                {format(new Date(article.publishedAt), 'd MMMM yyyy', { locale: id })}
+                {format(new Date(article.publishedAt), 'd MMMM yyyy', { locale: dateLocale })}
               </span>
             )}
             <span className="flex items-center gap-1.5">
-              <FiEye size={13} className="text-gold-500" /> {article.views} kali dibaca
+              <FiEye size={13} className="text-gold-500" /> {article.views} {t('articleDetail.timesRead')}
             </span>
           </div>
 
@@ -119,7 +120,7 @@ export default function ArticleDetailPage() {
               dangerouslySetInnerHTML={{ __html: content }}
             />
           ) : (
-            <p className="text-gray-400 text-center py-12 font-serif text-xl">Konten belum tersedia.</p>
+            <p className="text-gray-400 text-center py-12 font-serif text-xl">{t('articleDetail.contentNotAvailable')}</p>
           )}
 
           {/* Back */}
@@ -128,7 +129,7 @@ export default function ArticleDetailPage() {
               to="/activity"
               className="inline-flex items-center gap-2 px-5 py-2.5 border border-navy-200 text-navy-700 hover:bg-navy-700 hover:text-white rounded-full font-medium text-sm transition-all"
             >
-              <FiArrowLeft size={14} /> Kembali ke Kegiatan
+              <FiArrowLeft size={14} /> {t('articleDetail.backToActivity')}
             </Link>
           </div>
         </div>

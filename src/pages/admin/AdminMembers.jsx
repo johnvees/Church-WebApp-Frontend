@@ -1,12 +1,14 @@
 // Admin Members Page
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { FiPlus, FiEdit2, FiTrash2, FiArrowLeft, FiSave } from 'react-icons/fi'
 import AdminLayout from '../../components/layout/AdminLayout'
 import api from '../../utils/api'
 import toast from 'react-hot-toast'
 
 export function AdminMembersList() {
+  const { t } = useTranslation()
   const [members, setMembers] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -19,24 +21,24 @@ export function AdminMembersList() {
   useEffect(() => { load() }, [])
 
   const handleDelete = async (id, name) => {
-    if (!window.confirm(`Hapus "${name}"?`)) return
+    if (!window.confirm(`${t('admin.deleteConfirm')} "${name}"?`)) return
     await api.delete(`/members/${id}`)
-    toast.success('Anggota dihapus')
+    toast.success(t('admin.memberDeleted'))
     load()
   }
 
   const handleToggle = async (m) => {
     await api.put(`/members/${m._id}`, { isActive: !m.isActive })
-    toast.success(m.isActive ? 'Dinonaktifkan' : 'Diaktifkan')
+    toast.success(m.isActive ? t('admin.memberDeactivated') : t('admin.memberActivated'))
     load()
   }
 
   return (
     <AdminLayout>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="font-serif text-2xl font-bold text-navy-700">Struktur Organisasi</h1>
+        <h1 className="font-serif text-2xl font-bold text-navy-700">{t('admin.orgStructure')}</h1>
         <Link to="/admin/members/new" className="flex items-center gap-2 bg-gold-500 hover:bg-gold-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold">
-          <FiPlus size={16} /> Tambah Anggota
+          <FiPlus size={16} /> {t('admin.addMember')}
         </Link>
       </div>
 
@@ -45,17 +47,17 @@ export function AdminMembersList() {
           <div className="p-8 space-y-3">{[...Array(5)].map((_, i) => <div key={i} className="h-12 bg-gray-100 rounded-xl animate-pulse" />)}</div>
         ) : members.length === 0 ? (
           <div className="p-12 text-center">
-            <p className="text-gray-400 font-serif text-xl mb-4">Belum ada anggota</p>
-            <Link to="/admin/members/new" className="inline-flex items-center gap-2 bg-gold-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold"><FiPlus size={14} /> Tambah Anggota</Link>
+            <p className="text-gray-400 font-serif text-xl mb-4">{t('admin.noMembers')}</p>
+            <Link to="/admin/members/new" className="inline-flex items-center gap-2 bg-gold-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold"><FiPlus size={14} /> {t('admin.addMember')}</Link>
           </div>
         ) : (
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Nama</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase hidden sm:table-cell">Jabatan</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase hidden md:table-cell">Level</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase hidden sm:table-cell">Status</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">{t('admin.name')}</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase hidden sm:table-cell">{t('admin.position')}</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase hidden md:table-cell">{t('admin.level')}</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase hidden sm:table-cell">{t('admin.status')}</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
@@ -70,7 +72,7 @@ export function AdminMembersList() {
                   <td className="px-4 py-3 hidden md:table-cell"><span className="text-xs bg-navy-50 text-navy-600 px-2 py-1 rounded-full">Level {m.level}</span></td>
                   <td className="px-4 py-3 hidden sm:table-cell">
                     <button onClick={() => handleToggle(m)} className={`text-xs font-semibold px-2.5 py-1 rounded-full ${m.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-400'}`}>
-                      {m.isActive ? 'Aktif' : 'Nonaktif'}
+                      {m.isActive ? t('admin.active') : t('admin.inactive')}
                     </button>
                   </td>
                   <td className="px-4 py-3">
@@ -90,6 +92,7 @@ export function AdminMembersList() {
 }
 
 export function AdminMembersForm() {
+  const { t } = useTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
   const isEdit = !!id
@@ -119,18 +122,18 @@ export function AdminMembersForm() {
     setUploading(true)
     try {
       const { data } = await api.post('/members/upload-photo', fd)
-      if (data.success) { setForm(p => ({ ...p, photo: data.url })); toast.success('Foto diupload') }
-    } catch { toast.error('Gagal upload') } finally { setUploading(false) }
+      if (data.success) { setForm(p => ({ ...p, photo: data.url })); toast.success(t('admin.photoUploaded')) }
+    } catch { toast.error(t('admin.uploadFailedShort')) } finally { setUploading(false) }
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault(); setSaving(true)
     const payload = { ...form, parentId: form.parentId || null }
     try {
-      if (isEdit) { await api.put(`/members/${id}`, payload); toast.success('Anggota diperbarui') }
-      else { await api.post('/members', payload); toast.success('Anggota ditambahkan') }
+      if (isEdit) { await api.put(`/members/${id}`, payload); toast.success(t('admin.memberUpdated')) }
+      else { await api.post('/members', payload); toast.success(t('admin.memberAdded')) }
       navigate('/admin/members')
-    } catch (err) { toast.error(err.response?.data?.message || 'Gagal') } finally { setSaving(false) }
+    } catch (err) { toast.error(err.response?.data?.message || t('admin.failed')) } finally { setSaving(false) }
   }
 
   const inp = "w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-gold-400 transition-all"
@@ -140,43 +143,43 @@ export function AdminMembersForm() {
     <AdminLayout>
       <div className="flex items-center gap-3 mb-6">
         <Link to="/admin/members" className="p-2 hover:bg-gray-100 rounded-lg"><FiArrowLeft size={18} className="text-gray-500" /></Link>
-        <h1 className="font-serif text-2xl font-bold text-navy-700">{isEdit ? 'Edit Anggota' : 'Anggota Baru'}</h1>
+        <h1 className="font-serif text-2xl font-bold text-navy-700">{isEdit ? t('admin.editMember') : t('admin.newMember')}</h1>
       </div>
 
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-5 space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <div><label className={lbl}>Nama *</label><input className={inp} required value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></div>
-              <div><label className={lbl}>Periode</label><input className={inp} value={form.period} onChange={e => setForm({...form, period: e.target.value})} placeholder="2023-2026" /></div>
+              <div><label className={lbl}>{t('admin.name')} *</label><input className={inp} required value={form.name} onChange={e => setForm({...form, name: e.target.value})} /></div>
+              <div><label className={lbl}>{t('admin.period')}</label><input className={inp} value={form.period} onChange={e => setForm({...form, period: e.target.value})} placeholder="2023-2026" /></div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div><label className={lbl}>Jabatan (ID) *</label><input className={inp} required value={form.position_id} onChange={e => setForm({...form, position_id: e.target.value})} /></div>
-              <div><label className={lbl}>Position (EN)</label><input className={inp} value={form.position_en} onChange={e => setForm({...form, position_en: e.target.value})} /></div>
+              <div><label className={lbl}>{t('admin.positionId')} *</label><input className={inp} required value={form.position_id} onChange={e => setForm({...form, position_id: e.target.value})} /></div>
+              <div><label className={lbl}>{t('admin.positionEn')}</label><input className={inp} value={form.position_en} onChange={e => setForm({...form, position_en: e.target.value})} /></div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div><label className={lbl}>Departemen (ID)</label><input className={inp} value={form.department_id} onChange={e => setForm({...form, department_id: e.target.value})} /></div>
-              <div><label className={lbl}>Department (EN)</label><input className={inp} value={form.department_en} onChange={e => setForm({...form, department_en: e.target.value})} /></div>
+              <div><label className={lbl}>{t('admin.departmentId')}</label><input className={inp} value={form.department_id} onChange={e => setForm({...form, department_id: e.target.value})} /></div>
+              <div><label className={lbl}>{t('admin.departmentEn')}</label><input className={inp} value={form.department_en} onChange={e => setForm({...form, department_en: e.target.value})} /></div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div><label className={lbl}>Email</label><input className={inp} type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} /></div>
-              <div><label className={lbl}>Telepon</label><input className={inp} value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} /></div>
+              <div><label className={lbl}>{t('admin.phone')}</label><input className={inp} value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} /></div>
             </div>
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className={lbl}>Level Hierarki</label>
+                <label className={lbl}>{t('admin.hierarchyLevel')}</label>
                 <select className={inp} value={form.level} onChange={e => setForm({...form, level: parseInt(e.target.value)})}>
                   {[1,2,3,4,5].map(n => <option key={n} value={n}>Level {n}</option>)}
                 </select>
               </div>
               <div>
-                <label className={lbl}>Urutan</label>
+                <label className={lbl}>{t('admin.order')}</label>
                 <input className={inp} type="number" value={form.order} onChange={e => setForm({...form, order: parseInt(e.target.value) || 0})} />
               </div>
               <div>
-                <label className={lbl}>Atasan</label>
+                <label className={lbl}>{t('admin.superior')}</label>
                 <select className={inp} value={form.parentId} onChange={e => setForm({...form, parentId: e.target.value})}>
-                  <option value="">— Tidak ada —</option>
+                  <option value="">{t('admin.noSuperior')}</option>
                   {allMembers.filter(m => m._id !== id).map(m => <option key={m._id} value={m._id}>{m.name}</option>)}
                 </select>
               </div>
@@ -187,19 +190,19 @@ export function AdminMembersForm() {
             <div className="bg-white rounded-2xl border border-gray-100 p-5">
               <label className="flex items-center gap-3 cursor-pointer mb-4">
                 <input type="checkbox" className="w-4 h-4 accent-gold-500" checked={form.isActive} onChange={e => setForm({...form, isActive: e.target.checked})} />
-                <span className="text-sm text-gray-600">Aktif</span>
+                <span className="text-sm text-gray-600">{t('admin.active')}</span>
               </label>
               <button type="submit" disabled={saving} className="w-full flex items-center justify-center gap-2 bg-gold-500 hover:bg-gold-600 disabled:opacity-60 text-white font-semibold py-2.5 rounded-xl text-sm">
-                <FiSave size={15} /> {saving ? 'Menyimpan...' : 'Simpan'}
+                <FiSave size={15} /> {saving ? t('admin.saving') : t('common.save')}
               </button>
             </div>
 
             <div className="bg-white rounded-2xl border border-gray-100 p-5">
-              <label className={lbl}>Foto</label>
+              <label className={lbl}>{t('admin.photos')}</label>
               {form.photo && <img src={form.photo} className="w-24 h-24 rounded-full object-cover mx-auto mb-3 border-4 border-cream" />}
               <label className="flex items-center justify-center border-2 border-dashed border-gray-200 hover:border-gold-400 rounded-xl p-3 cursor-pointer transition-colors">
                 <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
-                <span className="text-sm text-gray-500">{uploading ? 'Uploading...' : 'Upload foto'}</span>
+                <span className="text-sm text-gray-500">{uploading ? 'Uploading...' : t('admin.uploadPhoto')}</span>
               </label>
             </div>
           </div>

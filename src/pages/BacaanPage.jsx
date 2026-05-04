@@ -7,7 +7,7 @@ import Layout from '../components/layout/Layout'
 import SectionReveal from '../components/ui/SectionReveal'
 import api from '../utils/api'
 import { format } from 'date-fns'
-import { id } from 'date-fns/locale'
+import { id as idLocale, enUS } from 'date-fns/locale'
 
 const CATEGORY_META = {
   'berita-misi': { icon: '📰', color: 'bg-blue-50 border-blue-200', badge: 'bg-blue-100 text-blue-700' },
@@ -26,10 +26,12 @@ const BACAAN_KEYS = {
 }
 
 function BacaanCard({ item, category }) {
+  const { t } = useTranslation()
   const lang = localStorage.getItem('lang') || 'id'
   const meta = CATEGORY_META[category] || {}
   const title = lang === 'en' && item.title_en ? item.title_en : item.title_id
   const excerpt = lang === 'en' && item.excerpt_en ? item.excerpt_en : item.excerpt_id
+  const dateLocale = lang === 'en' ? enUS : idLocale
 
   return (
     <Link to={`/bacaan/${category}/${item.slug}`}>
@@ -51,7 +53,7 @@ function BacaanCard({ item, category }) {
             {item.publishedAt && (
               <span className="flex items-center gap-1">
                 <FiCalendar size={11} />
-                {format(new Date(item.publishedAt), 'd MMM yyyy', { locale: id })}
+                {format(new Date(item.publishedAt), 'd MMM yyyy', { locale: dateLocale })}
               </span>
             )}
             <span className="flex items-center gap-1">
@@ -64,7 +66,7 @@ function BacaanCard({ item, category }) {
           {excerpt && <p className="text-gray-500 text-sm leading-relaxed line-clamp-2">{excerpt}</p>}
           {item.fileUrl && (
             <div className="mt-3 flex items-center gap-1.5 text-gold-600 text-xs font-semibold">
-              <FiBookOpen size={12} /> Ada dokumen tersedia
+              <FiBookOpen size={12} /> {t('bacaanPage.documentAvailable')}
             </div>
           )}
         </div>
@@ -178,7 +180,7 @@ export default function BacaanPage() {
                     onClick={loadMore}
                     className="px-8 py-3 border-2 border-navy-700 text-navy-700 hover:bg-navy-700 hover:text-white rounded-full font-semibold text-sm transition-all"
                   >
-                    Muat Lebih Banyak
+                    {t('bacaanPage.loadMore')}
                   </button>
                 </div>
               )}
@@ -186,8 +188,8 @@ export default function BacaanPage() {
           ) : (
             <div className="text-center py-24">
               <span className="text-6xl block mb-4">{meta.icon}</span>
-              <p className="font-serif text-2xl text-gray-400 mb-2">Belum ada konten</p>
-              <p className="text-gray-400 text-sm">Konten akan segera hadir</p>
+              <p className="font-serif text-2xl text-gray-400 mb-2">{t('bacaanPage.noContent')}</p>
+              <p className="text-gray-400 text-sm">{t('bacaanPage.contentComingSoon')}</p>
             </div>
           )}
         </div>

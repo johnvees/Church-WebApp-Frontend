@@ -2,30 +2,32 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FiHome, FiBook, FiUsers, FiImage, FiFileText, FiInfo, FiLogOut, FiMenu, FiX, FiUser, FiFeather } from 'react-icons/fi'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../context/AuthContext'
 import toast from 'react-hot-toast'
 
-const NAV = [
-  { label: 'Dashboard', icon: FiHome, path: '/admin/dashboard' },
-  { label: 'Bacaan', icon: FiBook, path: '/admin/bacaan' },
-  { label: 'Artikel', icon: FiFeather, path: '/admin/articles' },
-  { label: 'Galeri', icon: FiImage, path: '/admin/gallery' },
-  { label: 'Struktur', icon: FiUsers, path: '/admin/members' },
-  { label: 'Ayat Harian', icon: FiFileText, path: '/admin/verses' },
-  { label: 'Tentang', icon: FiInfo, path: '/admin/about' },
-]
-
-const ADMIN_ONLY = ['/admin/verses', '/admin/about']
-
 export default function AdminLayout({ children }) {
+  const { t } = useTranslation()
   const { user, logout, isAdmin } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
+  const NAV = [
+    { label: t('admin.dashboard'), icon: FiHome, path: '/admin/dashboard' },
+    { label: t('nav.bacaan'), icon: FiBook, path: '/admin/bacaan' },
+    { label: t('activity.articles'), icon: FiFeather, path: '/admin/articles' },
+    { label: t('home.gallery'), icon: FiImage, path: '/admin/gallery' },
+    { label: t('nav.struktur'), icon: FiUsers, path: '/admin/members' },
+    { label: t('admin.dailyVerse'), icon: FiFileText, path: '/admin/verses' },
+    { label: t('nav.about'), icon: FiInfo, path: '/admin/about' },
+  ]
+
+  const ADMIN_ONLY = ['/admin/verses', '/admin/about']
+
   const handleLogout = () => {
     logout()
-    toast.success('Berhasil keluar')
+    toast.success(t('admin.loggedOut'))
     navigate('/admin/login')
   }
 
@@ -86,7 +88,7 @@ export default function AdminLayout({ children }) {
           onClick={handleLogout}
           className="flex items-center gap-2.5 w-full px-4 py-2 text-white/50 hover:text-red-400 hover:bg-red-500/10 rounded-xl text-sm transition-all"
         >
-          <FiLogOut size={14} /> Keluar
+          <FiLogOut size={14} /> {t('admin.logout')}
         </button>
       </div>
     </div>
@@ -124,11 +126,11 @@ export default function AdminLayout({ children }) {
             <FiMenu size={20} />
           </button>
           <div className="hidden lg:block text-sm font-medium text-gray-600 capitalize">
-            {filteredNav.find(n => location.pathname.startsWith(n.path))?.label || 'Dashboard'}
+            {filteredNav.find(n => location.pathname.startsWith(n.path))?.label || t('admin.dashboard')}
           </div>
           <div className="flex items-center gap-2">
             <Link to="/" target="_blank" className="text-xs text-gray-400 hover:text-navy-700 transition-colors">
-              Lihat Website ↗
+              {t('admin.viewWebsite')}
             </Link>
           </div>
         </header>
