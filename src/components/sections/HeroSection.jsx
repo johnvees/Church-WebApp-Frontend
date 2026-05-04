@@ -33,31 +33,33 @@ export default function HeroSection() {
   }, [])
 
   return (
-    <section ref={containerRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-navy-900">
-      {/* Parallax background */}
-      <motion.div style={{ y }} className="absolute inset-0">
-        {/* Deep gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-navy-900 via-navy-800 to-[#0d1f45]" />
+    <section ref={containerRef} className="relative min-h-screen flex flex-col items-center justify-center bg-navy-900">
+      {/* Parallax background — overflow-hidden scoped here so content is never clipped */}
+      <div className="absolute inset-0 overflow-hidden">
+        <motion.div style={{ y }} className="absolute inset-0">
+          {/* Deep gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-navy-900 via-navy-800 to-[#0d1f45]" />
 
-        {/* Gold radial glow */}
-        <div className="absolute inset-0" style={{
-          background: 'radial-gradient(ellipse 80% 60% at 50% 60%, rgba(201,168,76,0.12) 0%, transparent 70%)'
-        }} />
+          {/* Gold radial glow */}
+          <div className="absolute inset-0" style={{
+            background: 'radial-gradient(ellipse 80% 60% at 50% 60%, rgba(201,168,76,0.12) 0%, transparent 70%)'
+          }} />
 
-        {/* Floating orbs */}
-        <FloatingOrb delay={0.3} style={{ width: 300, height: 300, top: '5%', right: '10%', background: 'radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%)' }} />
-        <FloatingOrb delay={0.6} style={{ width: 200, height: 200, bottom: '20%', left: '5%', background: 'radial-gradient(circle, rgba(201,168,76,0.06) 0%, transparent 70%)' }} />
-        <FloatingOrb delay={0.9} style={{ width: 150, height: 150, top: '40%', left: '15%', background: 'radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%)' }} />
+          {/* Floating orbs */}
+          <FloatingOrb delay={0.3} style={{ width: 300, height: 300, top: '5%', right: '10%', background: 'radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%)' }} />
+          <FloatingOrb delay={0.6} style={{ width: 200, height: 200, bottom: '20%', left: '5%', background: 'radial-gradient(circle, rgba(201,168,76,0.06) 0%, transparent 70%)' }} />
+          <FloatingOrb delay={0.9} style={{ width: 150, height: 150, top: '40%', left: '15%', background: 'radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%)' }} />
 
-        {/* Grid pattern */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{
-          backgroundImage: `linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)`,
-          backgroundSize: '60px 60px'
-        }} />
-      </motion.div>
+          {/* Grid pattern */}
+          <div className="absolute inset-0 opacity-[0.03]" style={{
+            backgroundImage: `linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)`,
+            backgroundSize: '60px 60px'
+          }} />
+        </motion.div>
+      </div>
 
-      {/* Content */}
-      <motion.div style={{ opacity }} className="relative z-10 max-w-4xl mx-auto px-4 text-center">
+      {/* Content — pt-20 clears the fixed navbar (h-16), pb-24 clears the scroll indicator */}
+      <motion.div style={{ opacity }} className="relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-6 text-center pt-20 pb-24 lg:pt-24">
         {/* Church badge */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -95,13 +97,13 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 30, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ delay: 0.8, duration: 0.8 }}
-            className="mt-10 mx-auto max-w-lg bg-white/8 backdrop-blur-md border border-white/15 rounded-3xl p-6 text-left"
+            className="mt-8 mx-auto max-w-lg bg-white/8 backdrop-blur-md border border-white/15 rounded-3xl p-4 sm:p-6 text-left"
           >
             <div className="flex items-center gap-2 mb-3">
               <div className="w-5 h-px bg-gold-500" />
               <p className="text-gold-400 text-xs font-semibold uppercase tracking-widest">{t('home.verseDay')}</p>
             </div>
-            <p className="text-white/90 font-serif italic text-base leading-relaxed mb-2">
+            <p className="text-white/90 font-serif italic text-sm sm:text-base leading-relaxed mb-2">
               "{lang === 'en' && verse.text_en ? verse.text_en : verse.text_id}"
             </p>
             <p className="text-gold-400 text-sm font-medium text-right">

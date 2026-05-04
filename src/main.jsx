@@ -3,12 +3,14 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import App from './App'
+import ScrollToTop from './components/ScrollToTop'
 import './index.css'
 import './i18n'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
+      <ScrollToTop />
       <App />
       <Toaster position="top-right" toastOptions={{
         style: { fontFamily: 'DM Sans', fontSize: '14px' },
