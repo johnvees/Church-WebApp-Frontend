@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
-import { FiArrowLeft, FiCalendar, FiEye, FiUser } from 'react-icons/fi'
+import { FiArrowLeft, FiCalendar, FiEye, FiUser, FiClock, FiLink } from 'react-icons/fi'
+import toast from 'react-hot-toast'
 import Layout from '../components/layout/Layout'
 import api from '../utils/api'
 import { format } from 'date-fns'
@@ -10,8 +11,8 @@ import { id as idLocale, enUS } from 'date-fns/locale'
 
 export default function ArticleDetailPage() {
   const { slug } = useParams()
-  const { t } = useTranslation()
-  const lang = localStorage.getItem('lang') || 'id'
+  const { t, i18n } = useTranslation()
+  const lang = i18n.language
   const [article, setArticle] = useState(null)
   const [loading, setLoading] = useState(true)
   const dateLocale = lang === 'en' ? enUS : idLocale
@@ -43,6 +44,13 @@ export default function ArticleDetailPage() {
 
   const title = lang === 'en' && article.title_en ? article.title_en : article.title_id
   const content = lang === 'en' && article.content_en ? article.content_en : article.content_id
+  const words = (content || '').replace(/<[^>]+>/g, '').trim().split(/\s+/).filter(Boolean).length
+  const mins = Math.max(1, Math.ceil(words / 200))
+
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href)
+    toast.success(t('articleDetail.linkCopied'))
+  }
 
   return (
     <Layout>
@@ -85,21 +93,32 @@ export default function ArticleDetailPage() {
           )}
 
           {/* Meta */}
-          <div className={`flex flex-wrap items-center gap-4 text-sm text-gray-400 border-b border-gray-100 pb-6 mb-8 ${article.coverImage ? 'mt-0' : ''}`}>
-            {article.author?.name && (
+          <div className={`flex flex-wrap items-center justify-between gap-4 text-sm text-gray-400 border-b border-gray-100 pb-6 mb-8 ${article.coverImage ? 'mt-0' : ''}`}>
+            <div className="flex flex-wrap items-center gap-4">
+              {article.author?.name && (
+                <span className="flex items-center gap-1.5">
+                  <FiUser size={13} className="text-gold-500" /> {article.author.name}
+                </span>
+              )}
+              {article.publishedAt && (
+                <span className="flex items-center gap-1.5">
+                  <FiCalendar size={13} className="text-gold-500" />
+                  {format(new Date(article.publishedAt), 'd MMMM yyyy', { locale: dateLocale })}
+                </span>
+              )}
               <span className="flex items-center gap-1.5">
-                <FiUser size={13} className="text-gold-500" /> {article.author.name}
+                <FiEye size={13} className="text-gold-500" /> {article.views} {t('articleDetail.timesRead')}
               </span>
-            )}
-            {article.publishedAt && (
               <span className="flex items-center gap-1.5">
-                <FiCalendar size={13} className="text-gold-500" />
-                {format(new Date(article.publishedAt), 'd MMMM yyyy', { locale: dateLocale })}
+                <FiClock size={13} className="text-gold-500" /> {mins} {t('articleDetail.minRead')}
               </span>
-            )}
-            <span className="flex items-center gap-1.5">
-              <FiEye size={13} className="text-gold-500" /> {article.views} {t('articleDetail.timesRead')}
-            </span>
+            </div>
+            <button
+              onClick={handleShare}
+              className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-200 hover:border-gold-400 hover:text-gold-600 rounded-full text-xs font-medium transition-all"
+            >
+              <FiLink size={12} /> {t('articleDetail.share')}
+            </button>
           </div>
 
           {/* Tags */}

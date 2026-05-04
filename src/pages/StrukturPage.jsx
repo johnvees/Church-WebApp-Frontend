@@ -7,7 +7,8 @@ import SectionReveal from '../components/ui/SectionReveal'
 import api from '../utils/api'
 
 function MemberCard({ member, delay = 0 }) {
-  const lang = localStorage.getItem('lang') || 'id'
+  const { i18n } = useTranslation()
+  const lang = i18n.language
   const position = lang === 'en' && member.position_en ? member.position_en : member.position_id
   const department = lang === 'en' && member.department_en ? member.department_en : member.department_id
 

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { useInView } from 'react-intersection-observer'
-import { FiArrowRight, FiCalendar, FiEye } from 'react-icons/fi'
+import { FiArrowRight, FiCalendar, FiEye, FiGlobe, FiBookOpen, FiUsers, FiHeart, FiStar, FiBook, FiSun } from 'react-icons/fi'
 import Layout from '../components/layout/Layout'
 import HeroSection from '../components/sections/HeroSection'
 import SectionReveal from '../components/ui/SectionReveal'
@@ -12,20 +12,28 @@ import { format } from 'date-fns'
 import { id as idLocale, enUS } from 'date-fns/locale'
 
 const BACAAN_CARDS = [
-  { key: 'beritaMisi', path: '/bacaan/berita-misi', icon: '📰', color: 'from-blue-500 to-blue-700' },
-  { key: 'sekolahSabat', path: '/bacaan/sekolah-sabat', icon: '📖', color: 'from-emerald-500 to-emerald-700' },
-  { key: 'pelayananPerorangan', path: '/bacaan/pelayanan-perorangan', icon: '🤝', color: 'from-purple-500 to-purple-700' },
-  { key: 'bacaanPersembahan', path: '/bacaan/bacaan-persembahan', icon: '🙏', color: 'from-rose-500 to-rose-700' },
-  { key: 'ceritaAnak', path: '/bacaan/cerita-anak', icon: '👧', color: 'from-orange-400 to-orange-600' },
-  { key: 'perpustakaan', path: '/bacaan/perpustakaan', icon: '📚', color: 'from-teal-500 to-teal-700' },
-  { key: 'liturgiSabat', path: '/bacaan/liturgi-sabat', icon: '✝️', color: 'from-indigo-500 to-indigo-700' },
+  { key: 'beritaMisi', path: '/bacaan/berita-misi', Icon: FiGlobe },
+  { key: 'sekolahSabat', path: '/bacaan/sekolah-sabat', Icon: FiBookOpen },
+  { key: 'pelayananPerorangan', path: '/bacaan/pelayanan-perorangan', Icon: FiUsers },
+  { key: 'bacaanPersembahan', path: '/bacaan/bacaan-persembahan', Icon: FiHeart },
+  { key: 'ceritaAnak', path: '/bacaan/cerita-anak', Icon: FiStar },
+  { key: 'perpustakaan', path: '/bacaan/perpustakaan', Icon: FiBook },
+  { key: 'liturgiSabat', path: '/bacaan/liturgi-sabat', Icon: FiSun },
 ]
 
+function readingTime(html) {
+  const words = (html || '').replace(/<[^>]+>/g, '').trim().split(/\s+/).filter(Boolean).length
+  return Math.max(1, Math.ceil(words / 200))
+}
+
 function ArticleCard({ article }) {
-  const lang = localStorage.getItem('lang') || 'id'
+  const { i18n, t } = useTranslation()
+  const lang = i18n.language
   const title = lang === 'en' && article.title_en ? article.title_en : article.title_id
   const excerpt = lang === 'en' && article.excerpt_en ? article.excerpt_en : article.excerpt_id
+  const content = lang === 'en' && article.content_en ? article.content_en : article.content_id
   const dateLocale = lang === 'en' ? enUS : idLocale
+  const mins = readingTime(content)
 
   return (
     <Link to={`/activity/artikel/${article.slug}`} className="group block">
@@ -51,6 +59,8 @@ function ArticleCard({ article }) {
             <span className="flex items-center gap-1">
               <FiEye size={11} /> {article.views || 0}
             </span>
+            <span className="text-gray-300">·</span>
+            <span>{mins} {t('articleDetail.minRead')}</span>
           </div>
           <h3 className="font-serif font-semibold text-navy-700 text-base leading-snug mb-2 group-hover:text-gold-600 transition-colors line-clamp-2">
             {title}
@@ -63,10 +73,10 @@ function ArticleCard({ article }) {
 }
 
 export default function HomePage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const lang = i18n.language
   const [articles, setArticles] = useState([])
   const [gallery, setGallery] = useState([])
-  const lang = localStorage.getItem('lang') || 'id'
 
   useEffect(() => {
     api.get('/articles?limit=3').then(({ data }) => {
@@ -99,10 +109,10 @@ export default function HomePage() {
                     whileTap={{ scale: 0.97 }}
                     className="bg-white rounded-2xl p-5 text-center shadow-sm hover:shadow-lg border border-gray-100 transition-all duration-300 cursor-pointer h-full"
                   >
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform shadow-md`}>
-                      <span className="text-xl">{item.icon}</span>
+                    <div className="w-12 h-12 rounded-xl bg-cream border border-gold-300 flex items-center justify-center mx-auto mb-3 group-hover:bg-navy-700 group-hover:border-navy-700 transition-all duration-300">
+                      <item.Icon size={20} className="text-navy-700 group-hover:text-gold-400 transition-colors duration-300" />
                     </div>
-                    <p className="text-navy-700 font-medium text-sm leading-snug group-hover:text-gold-600 transition-colors">
+                    <p className="font-serif text-navy-700 font-medium text-sm leading-snug group-hover:text-gold-600 transition-colors">
                       {t(`bacaan.${item.key}`)}
                     </p>
                   </motion.div>
@@ -189,7 +199,7 @@ export default function HomePage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {gallery.map((item, i) => (
                 <SectionReveal key={item._id} delay={i * 0.08}>
-                  <Link to="/activity#gallery">
+                  <Link to={`/activity/galeri/${item._id}`}>
                     <motion.div
                       whileHover={{ scale: 1.03 }}
                       className="relative aspect-square rounded-2xl overflow-hidden bg-navy-800"

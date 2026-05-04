@@ -1,54 +1,75 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
-import { FiCalendar, FiEye, FiX } from 'react-icons/fi'
+import { FiCalendar, FiEye, FiImage } from 'react-icons/fi'
 import Layout from '../components/layout/Layout'
 import SectionReveal from '../components/ui/SectionReveal'
 import api from '../utils/api'
 import { format } from 'date-fns'
 import { id as idLocale, enUS } from 'date-fns/locale'
 
-function Lightbox({ photo, onClose }) {
-  const lang = localStorage.getItem('lang') || 'id'
-  const caption = lang === 'en' && photo.caption_en ? photo.caption_en : photo.caption_id
+function AlbumCollage({ photos, coverImage }) {
+  const imgs = photos?.length ? photos : (coverImage ? [{ url: coverImage }] : [])
 
+  if (imgs.length === 0) {
+    return (
+      <div className="w-full h-full bg-navy-800 flex items-center justify-center">
+        <FiImage size={32} className="text-white/20" />
+      </div>
+    )
+  }
+
+  if (imgs.length === 1) {
+    return <img src={imgs[0].url} alt="" className="w-full h-full object-cover" />
+  }
+
+  if (imgs.length === 2) {
+    return (
+      <div className="grid grid-cols-2 h-full gap-px">
+        {imgs.slice(0, 2).map((p, i) => (
+          <img key={i} src={p.url} alt="" className="w-full h-full object-cover" />
+        ))}
+      </div>
+    )
+  }
+
+  if (imgs.length === 3) {
+    return (
+      <div className="grid grid-cols-2 h-full gap-px">
+        <img src={imgs[0].url} alt="" className="w-full h-full object-cover" />
+        <div className="grid grid-rows-2 gap-px">
+          <img src={imgs[1].url} alt="" className="w-full h-full object-cover" />
+          <img src={imgs[2].url} alt="" className="w-full h-full object-cover" />
+        </div>
+      </div>
+    )
+  }
+
+  // 4+: 2×2 grid
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
-        onClick={onClose}
-      >
-        <motion.div
-          initial={{ scale: 0.85 }}
-          animate={{ scale: 1 }}
-          exit={{ scale: 0.85 }}
-          className="relative max-w-4xl max-h-[85vh] w-full"
-          onClick={e => e.stopPropagation()}
-        >
-          <img src={photo.url} alt="" className="w-full h-full object-contain rounded-xl" />
-          <button onClick={onClose} className="absolute top-4 right-4 w-10 h-10 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/80 transition-colors">
-            <FiX size={18} />
-          </button>
-          {caption && <p className="text-white/80 text-center text-sm mt-3">{caption}</p>}
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+    <div className="grid grid-cols-2 grid-rows-2 h-full gap-px">
+      {imgs.slice(0, 4).map((p, i) => (
+        <img key={i} src={p.url} alt="" className="w-full h-full object-cover" />
+      ))}
+    </div>
   )
 }
 
+const LIMIT = 12
+
 export default function ActivityPage() {
-  const { t } = useTranslation()
-  const lang = localStorage.getItem('lang') || 'id'
+  const { t, i18n } = useTranslation()
+  const lang = i18n.language
   const [tab, setTab] = useState('artikel')
   const [articles, setArticles] = useState([])
   const [galleries, setGalleries] = useState([])
-  const [activeGallery, setActiveGallery] = useState(null)
-  const [lightbox, setLightbox] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [artTotal, setArtTotal] = useState(0)
+  const [galTotal, setGalTotal] = useState(0)
+  const [artPage, setArtPage] = useState(1)
+  const [galPage, setGalPage] = useState(1)
+  const [loadingMore, setLoadingMore] = useState(false)
   const dateLocale = lang === 'en' ? enUS : idLocale
 
   const tabs = [
@@ -58,63 +79,32 @@ export default function ActivityPage() {
 
   useEffect(() => {
     Promise.all([
-      api.get('/articles?limit=12'),
-      api.get('/gallery?limit=12'),
+      api.get(`/articles?limit=${LIMIT}`),
+      api.get(`/gallery?limit=${LIMIT}`),
     ]).then(([artRes, galRes]) => {
-      if (artRes.data.success) setArticles(artRes.data.data)
-      if (galRes.data.success) setGalleries(galRes.data.data)
+      if (artRes.data.success) { setArticles(artRes.data.data); setArtTotal(artRes.data.total || 0) }
+      if (galRes.data.success) { setGalleries(galRes.data.data); setGalTotal(galRes.data.total || 0) }
     }).finally(() => setLoading(false))
   }, [])
 
-  const openGallery = async (gallery) => {
-    const { data } = await api.get(`/gallery/${gallery._id}`)
-    if (data.success) setActiveGallery(data.data)
+  const loadMoreArticles = async () => {
+    setLoadingMore(true)
+    const next = artPage + 1
+    const { data } = await api.get(`/articles?limit=${LIMIT}&page=${next}`)
+    if (data.success) { setArticles(prev => [...prev, ...data.data]); setArtPage(next) }
+    setLoadingMore(false)
+  }
+
+  const loadMoreGalleries = async () => {
+    setLoadingMore(true)
+    const next = galPage + 1
+    const { data } = await api.get(`/gallery?limit=${LIMIT}&page=${next}`)
+    if (data.success) { setGalleries(prev => [...prev, ...data.data]); setGalPage(next) }
+    setLoadingMore(false)
   }
 
   return (
     <Layout>
-      {lightbox && <Lightbox photo={lightbox} onClose={() => setLightbox(null)} />}
-
-      {/* Album modal */}
-      <AnimatePresence>
-        {activeGallery && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80 z-40 flex items-end sm:items-center justify-center p-4"
-            onClick={() => setActiveGallery(null)}
-          >
-            <motion.div
-              initial={{ y: 60 }}
-              animate={{ y: 0 }}
-              exit={{ y: 60 }}
-              className="bg-white rounded-3xl w-full max-w-3xl max-h-[80vh] overflow-auto"
-              onClick={e => e.stopPropagation()}
-            >
-              <div className="p-6 border-b flex items-center justify-between">
-                <h3 className="font-serif text-xl font-semibold text-navy-700">{lang === 'en' && activeGallery.title_en ? activeGallery.title_en : activeGallery.title_id}</h3>
-                <button onClick={() => setActiveGallery(null)} className="w-8 h-8 rounded-full border flex items-center justify-center text-gray-400 hover:bg-gray-100">
-                  <FiX size={16} />
-                </button>
-              </div>
-              <div className="p-5 grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {activeGallery.photos?.map((photo, i) => (
-                  <motion.div
-                    key={i}
-                    whileHover={{ scale: 1.02 }}
-                    className="aspect-square rounded-xl overflow-hidden cursor-pointer"
-                    onClick={() => setLightbox(photo)}
-                  >
-                    <img src={photo.url} alt="" className="w-full h-full object-cover" />
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Header */}
       <div className="bg-navy-700 pt-28 pb-16 text-center relative overflow-hidden">
         <div className="absolute inset-0 opacity-10" style={{
@@ -126,8 +116,6 @@ export default function ActivityPage() {
             {t('nav.activity')}
           </motion.h1>
           <div className="gold-divider mx-auto" />
-
-          {/* Tabs */}
           <div className="flex justify-center gap-2 mt-6">
             {tabs.map(tabItem => (
               <button
@@ -152,6 +140,7 @@ export default function ActivityPage() {
             </div>
           ) : tab === 'artikel' ? (
             articles.length > 0 ? (
+              <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {articles.map((article, i) => (
                   <SectionReveal key={article._id} delay={i * 0.07}>
@@ -180,38 +169,72 @@ export default function ActivityPage() {
                   </SectionReveal>
                 ))}
               </div>
+              {articles.length < artTotal && (
+                <div className="text-center mt-10">
+                  <button onClick={loadMoreArticles} disabled={loadingMore}
+                    className="px-8 py-3 border-2 border-navy-700 text-navy-700 hover:bg-navy-700 hover:text-white rounded-full font-semibold text-sm transition-all disabled:opacity-50">
+                    {loadingMore ? t('common.loading') : t('bacaanPage.loadMore')}
+                  </button>
+                </div>
+              )}
+              </>
             ) : <p className="text-center text-gray-400 py-20 font-serif text-xl">{t('activity.noArticles')}</p>
           ) : (
             galleries.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {galleries.map((gallery, i) => (
-                  <SectionReveal key={gallery._id} delay={i * 0.07}>
-                    <motion.div
-                      whileHover={{ y: -4 }}
-                      onClick={() => openGallery(gallery)}
-                      className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-all cursor-pointer"
-                    >
-                      <div className="h-52 overflow-hidden relative">
-                        {gallery.coverImage ? (
-                          <img src={gallery.coverImage} alt="" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-navy-700 to-navy-900 flex items-center justify-center">
-                            <span className="font-serif text-4xl text-gold-400">📷</span>
+              <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {galleries.map((gallery, i) => {
+                  const title = lang === 'en' && gallery.title_en ? gallery.title_en : gallery.title_id
+                  return (
+                    <SectionReveal key={gallery._id} delay={i * 0.07}>
+                      <Link to={`/activity/galeri/${gallery._id}`}>
+                        <motion.div
+                          whileHover={{ y: -4 }}
+                          className="group rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 bg-navy-800"
+                        >
+                          {/* Photo collage */}
+                          <div className="aspect-[4/3] overflow-hidden relative">
+                            <div className="w-full h-full group-hover:scale-[1.02] transition-transform duration-500">
+                              <AlbumCollage photos={gallery.photos} coverImage={gallery.coverImage} />
+                            </div>
+                            {/* Dark gradient overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+
+                            {/* Photo count badge */}
+                            {gallery.photos?.length > 0 && (
+                              <div className="absolute top-3 left-3 bg-black/50 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1">
+                                <FiImage size={11} /> {gallery.photos.length}
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </div>
-                      <div className="p-4">
-                        <h3 className="font-serif font-semibold text-navy-700">{lang === 'en' && gallery.title_en ? gallery.title_en : gallery.title_id}</h3>
-                        {gallery.eventDate && (
-                          <p className="text-gray-400 text-xs mt-1 flex items-center gap-1">
-                            <FiCalendar size={11} /> {format(new Date(gallery.eventDate), 'd MMMM yyyy', { locale: dateLocale })}
-                          </p>
-                        )}
-                      </div>
-                    </motion.div>
-                  </SectionReveal>
-                ))}
+
+                          {/* Info row */}
+                          <div className="bg-white px-4 py-3.5 border-t border-gray-100">
+                            <h3 className="font-serif font-semibold text-navy-700 leading-snug line-clamp-1 group-hover:text-gold-600 transition-colors">
+                              {title}
+                            </h3>
+                            {gallery.eventDate && (
+                              <p className="text-gray-400 text-xs mt-0.5 flex items-center gap-1">
+                                <FiCalendar size={11} />
+                                {format(new Date(gallery.eventDate), 'd MMMM yyyy', { locale: dateLocale })}
+                              </p>
+                            )}
+                          </div>
+                        </motion.div>
+                      </Link>
+                    </SectionReveal>
+                  )
+                })}
               </div>
+              {galleries.length < galTotal && (
+                <div className="text-center mt-10">
+                  <button onClick={loadMoreGalleries} disabled={loadingMore}
+                    className="px-8 py-3 border-2 border-navy-700 text-navy-700 hover:bg-navy-700 hover:text-white rounded-full font-semibold text-sm transition-all disabled:opacity-50">
+                    {loadingMore ? t('common.loading') : t('bacaanPage.loadMore')}
+                  </button>
+                </div>
+              )}
+              </>
             ) : <p className="text-center text-gray-400 py-20 font-serif text-xl">{t('activity.noGallery')}</p>
           )}
         </div>

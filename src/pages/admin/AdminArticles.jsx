@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { FiPlus, FiEdit2, FiTrash2, FiEye, FiArrowLeft, FiSave } from 'react-icons/fi'
 import AdminLayout from '../../components/layout/AdminLayout'
+import RichTextEditor from '../../components/ui/RichTextEditor'
 import api from '../../utils/api'
 import toast from 'react-hot-toast'
 
@@ -137,15 +138,20 @@ export function AdminArticleForm() {
   const handleUpload = async (e) => {
     const file = e.target.files[0]
     if (!file) return
-    const formData = new FormData()
-    formData.append('image', file)
     setUploading(true)
     try {
-      const { data } = await api.post('/articles/upload-image', formData)
-      if (data.success) {
-        setForm(prev => ({ ...prev, coverImage: data.url }))
-        toast.success(t('admin.imageUploaded'))
-      }
+      const { data: sign } = await api.get('/gallery/admin/sign-upload')
+      const fd = new FormData()
+      fd.append('file', file)
+      fd.append('api_key', sign.apiKey)
+      fd.append('timestamp', String(sign.timestamp))
+      fd.append('signature', sign.signature)
+      fd.append('folder', sign.folder)
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${sign.cloudName}/image/upload`, { method: 'POST', body: fd })
+      const result = await res.json()
+      if (result.error) throw new Error(result.error.message)
+      setForm(prev => ({ ...prev, coverImage: result.secure_url }))
+      toast.success(t('admin.imageUploaded'))
     } catch {
       toast.error(t('admin.uploadFailed'))
     } finally {
@@ -217,12 +223,19 @@ export function AdminArticleForm() {
               </div>
               <div>
                 <label className={lbl}>{t('admin.contentId')} *</label>
-                <textarea className={inp} rows={10} required value={form.content_id} onChange={e => setForm({...form, content_id: e.target.value})} placeholder={t('admin.writeContentHere')} />
-                <p className="text-xs text-gray-400 mt-1">{t('admin.htmlSupport')} &lt;b&gt;, &lt;i&gt;, &lt;p&gt;, &lt;h2&gt;, etc.</p>
+                <RichTextEditor
+                  value={form.content_id}
+                  onChange={val => setForm(prev => ({ ...prev, content_id: val }))}
+                  placeholder="Mulai menulis konten artikel (ID)..."
+                />
               </div>
               <div>
                 <label className={lbl}>{t('admin.contentEn')}</label>
-                <textarea className={inp} rows={10} value={form.content_en} onChange={e => setForm({...form, content_en: e.target.value})} placeholder="Write article content here..." />
+                <RichTextEditor
+                  value={form.content_en}
+                  onChange={val => setForm(prev => ({ ...prev, content_en: val }))}
+                  placeholder="Write article content here (EN)..."
+                />
               </div>
             </div>
           </div>

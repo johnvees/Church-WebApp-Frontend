@@ -37,6 +37,7 @@ i18n.use(initReactI18next).init({
       articleDetail: {
         notFound: 'Artikel tidak ditemukan', backToActivity: 'Kembali ke Kegiatan',
         timesRead: 'kali dibaca', contentNotAvailable: 'Konten belum tersedia.',
+        share: 'Bagikan', linkCopied: 'Tautan disalin!', minRead: 'menit baca',
       },
       aboutPage: {
         visionPlaceholder: 'Visi jemaat akan ditampilkan di sini.',
@@ -53,6 +54,7 @@ i18n.use(initReactI18next).init({
       activity: {
         articles: 'Artikel', galleryTab: 'Galeri',
         noArticles: 'Belum ada artikel', noGallery: 'Belum ada galeri',
+        viewAlbum: 'Lihat',
       },
       common: { loading: 'Memuat...', noData: 'Tidak ada data', back: 'Kembali', save: 'Simpan', cancel: 'Batal', delete: 'Hapus', edit: 'Edit', add: 'Tambah', search: 'Cari', churchAbbr: 'GMAHK', churchCopyright: 'GMAHK Ekklesia' },
       about: { title: 'Tentang Kami', vision: 'Visi', mission: 'Misi', history: 'Sejarah', contact: 'Kontak' },
@@ -60,7 +62,7 @@ i18n.use(initReactI18next).init({
         dashboard: 'Dashboard', login: 'Masuk', logout: 'Keluar',
         greeting: { morning: 'Selamat Pagi', afternoon: 'Selamat Siang', evening: 'Selamat Malam' },
         totalArticles: 'Total Artikel', readingContent: 'Konten Bacaan',
-        orgMembers: 'Anggota Org.', galleryAlbums: 'Album Galeri',
+        orgMembers: 'Anggota Org.', galleryAlbums: 'Album Galeri', totalViews: 'Total Dibaca',
         recentArticles: 'Artikel Terbaru', quickActions: 'Aksi Cepat',
         writeArticle: 'Tulis Artikel', uploadGallery: 'Upload Galeri',
         addContent: 'Tambah Konten', manageMembers: 'Kelola Anggota',
@@ -164,6 +166,7 @@ i18n.use(initReactI18next).init({
       articleDetail: {
         notFound: 'Article not found', backToActivity: 'Back to Activities',
         timesRead: 'times read', contentNotAvailable: 'Content not available yet.',
+        share: 'Share', linkCopied: 'Link copied!', minRead: 'min read',
       },
       aboutPage: {
         visionPlaceholder: 'Church vision will be displayed here.',
@@ -180,6 +183,7 @@ i18n.use(initReactI18next).init({
       activity: {
         articles: 'Articles', galleryTab: 'Gallery',
         noArticles: 'No articles yet', noGallery: 'No gallery yet',
+        viewAlbum: 'View',
       },
       common: { loading: 'Loading...', noData: 'No data', back: 'Back', save: 'Save', cancel: 'Cancel', delete: 'Delete', edit: 'Edit', add: 'Add', search: 'Search', churchAbbr: 'SDA', churchCopyright: 'SDA Ekklesia' },
       about: { title: 'About Us', vision: 'Vision', mission: 'Mission', history: 'History', contact: 'Contact' },
@@ -187,7 +191,7 @@ i18n.use(initReactI18next).init({
         dashboard: 'Dashboard', login: 'Login', logout: 'Logout',
         greeting: { morning: 'Good Morning', afternoon: 'Good Afternoon', evening: 'Good Evening' },
         totalArticles: 'Total Articles', readingContent: 'Reading Content',
-        orgMembers: 'Org. Members', galleryAlbums: 'Gallery Albums',
+        orgMembers: 'Org. Members', galleryAlbums: 'Gallery Albums', totalViews: 'Total Views',
         recentArticles: 'Recent Articles', quickActions: 'Quick Actions',
         writeArticle: 'Write Article', uploadGallery: 'Upload Gallery',
         addContent: 'Add Content', manageMembers: 'Manage Members',

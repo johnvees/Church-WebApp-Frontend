@@ -4,6 +4,7 @@ import { motion, useScroll, useTransform } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { FiChevronDown } from 'react-icons/fi'
 import api from '../../utils/api'
+import { getTodayVerse } from '../../data/dailyVerses'
 
 // Floating cross/light orb element
 const FloatingOrb = ({ style, delay = 0 }) => (
@@ -17,18 +18,23 @@ const FloatingOrb = ({ style, delay = 0 }) => (
 )
 
 export default function HeroSection() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const lang = i18n.language
   const containerRef = useRef(null)
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ['start start', 'end start'] })
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '30%'])
   const opacity = useTransform(scrollYProgress, [0, 0.7], [1, 0])
-
-  const [verse, setVerse] = useState(null)
-  const lang = localStorage.getItem('lang') || 'id'
+  const [verse, setVerse] = useState(getTodayVerse())
 
   useEffect(() => {
     api.get('/verses/today').then(({ data }) => {
-      if (data.success) setVerse(data.data)
+      if (data.success && data.data) {
+        const verseDate = new Date(data.data.date)
+        const today = new Date()
+        if (verseDate.toDateString() === today.toDateString()) {
+          setVerse(data.data)
+        }
+      }
     }).catch(() => {})
   }, [])
 

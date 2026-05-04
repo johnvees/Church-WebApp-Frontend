@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
-import { FiCalendar, FiEye, FiBookOpen, FiArrowRight } from 'react-icons/fi'
+import { FiCalendar, FiEye, FiBookOpen, FiArrowRight, FiGlobe, FiUsers, FiHeart, FiStar, FiBook, FiSun, FiSearch, FiX } from 'react-icons/fi'
 import Layout from '../components/layout/Layout'
 import SectionReveal from '../components/ui/SectionReveal'
 import api from '../utils/api'
@@ -10,13 +10,13 @@ import { format } from 'date-fns'
 import { id as idLocale, enUS } from 'date-fns/locale'
 
 const CATEGORY_META = {
-  'berita-misi': { icon: '📰', color: 'bg-blue-50 border-blue-200', badge: 'bg-blue-100 text-blue-700' },
-  'sekolah-sabat': { icon: '📖', color: 'bg-emerald-50 border-emerald-200', badge: 'bg-emerald-100 text-emerald-700' },
-  'pelayanan-perorangan': { icon: '🤝', color: 'bg-purple-50 border-purple-200', badge: 'bg-purple-100 text-purple-700' },
-  'bacaan-persembahan': { icon: '🙏', color: 'bg-rose-50 border-rose-200', badge: 'bg-rose-100 text-rose-700' },
-  'cerita-anak': { icon: '👧', color: 'bg-orange-50 border-orange-200', badge: 'bg-orange-100 text-orange-700' },
-  'perpustakaan': { icon: '📚', color: 'bg-teal-50 border-teal-200', badge: 'bg-teal-100 text-teal-700' },
-  'liturgi-sabat': { icon: '✝️', color: 'bg-indigo-50 border-indigo-200', badge: 'bg-indigo-100 text-indigo-700' },
+  'berita-misi': { Icon: FiGlobe, color: 'bg-cream border-gold-200', badge: 'bg-navy-50 text-navy-700' },
+  'sekolah-sabat': { Icon: FiBookOpen, color: 'bg-cream border-gold-200', badge: 'bg-navy-50 text-navy-700' },
+  'pelayanan-perorangan': { Icon: FiUsers, color: 'bg-cream border-gold-200', badge: 'bg-navy-50 text-navy-700' },
+  'bacaan-persembahan': { Icon: FiHeart, color: 'bg-cream border-gold-200', badge: 'bg-navy-50 text-navy-700' },
+  'cerita-anak': { Icon: FiStar, color: 'bg-cream border-gold-200', badge: 'bg-navy-50 text-navy-700' },
+  'perpustakaan': { Icon: FiBook, color: 'bg-cream border-gold-200', badge: 'bg-navy-50 text-navy-700' },
+  'liturgi-sabat': { Icon: FiSun, color: 'bg-cream border-gold-200', badge: 'bg-navy-50 text-navy-700' },
 }
 
 const BACAAN_KEYS = {
@@ -26,8 +26,8 @@ const BACAAN_KEYS = {
 }
 
 function BacaanCard({ item, category }) {
-  const { t } = useTranslation()
-  const lang = localStorage.getItem('lang') || 'id'
+  const { t, i18n } = useTranslation()
+  const lang = i18n.language
   const meta = CATEGORY_META[category] || {}
   const title = lang === 'en' && item.title_en ? item.title_en : item.title_id
   const excerpt = lang === 'en' && item.excerpt_en ? item.excerpt_en : item.excerpt_id
@@ -44,8 +44,8 @@ function BacaanCard({ item, category }) {
             <img src={item.coverImage} alt={title} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
           </div>
         ) : (
-          <div className={`h-44 flex items-center justify-center text-4xl ${meta.color} border-b`}>
-            {meta.icon}
+          <div className={`h-44 flex items-center justify-center ${meta.color} border-b`}>
+            {meta.Icon && <meta.Icon size={40} className="text-navy-700 opacity-40" />}
           </div>
         )}
         <div className="p-5">
@@ -77,11 +77,13 @@ function BacaanCard({ item, category }) {
 
 export default function BacaanPage() {
   const { category } = useParams()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const lang = i18n.language
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
+  const [search, setSearch] = useState('')
   const LIMIT = 9
 
   const categoryKey = BACAAN_KEYS[category] || 'beritaMisi'
@@ -90,6 +92,7 @@ export default function BacaanPage() {
   useEffect(() => {
     setLoading(true)
     setPage(1)
+    setSearch('')
     api.get(`/bacaan?category=${category}&page=1&limit=${LIMIT}`)
       .then(({ data }) => {
         if (data.success) {
@@ -118,8 +121,8 @@ export default function BacaanPage() {
           backgroundSize: '30px 30px'
         }} />
         <div className="relative max-w-7xl mx-auto px-4 text-center">
-          <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-5xl block mb-4">
-            {meta.icon}
+          <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="flex justify-center mb-4">
+            {meta.Icon && <meta.Icon size={48} className="text-gold-400" />}
           </motion.span>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -159,6 +162,24 @@ export default function BacaanPage() {
       {/* Content */}
       <section className="py-16 bg-white min-h-[50vh]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Search */}
+          <div className="mb-8 max-w-sm">
+            <div className="relative">
+              <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+              <input
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder={`${t('common.search')}...`}
+                className="w-full pl-9 pr-9 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-gold-400 focus:ring-1 focus:ring-gold-100 transition-all"
+              />
+              {search && (
+                <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500">
+                  <FiX size={14} />
+                </button>
+              )}
+            </div>
+          </div>
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, i) => (
@@ -166,28 +187,40 @@ export default function BacaanPage() {
               ))}
             </div>
           ) : items.length > 0 ? (
-            <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {items.map((item, i) => (
-                  <SectionReveal key={item._id} delay={i * 0.05}>
-                    <BacaanCard item={item} category={category} />
-                  </SectionReveal>
-                ))}
-              </div>
-              {items.length < total && (
-                <div className="text-center mt-10">
-                  <button
-                    onClick={loadMore}
-                    className="px-8 py-3 border-2 border-navy-700 text-navy-700 hover:bg-navy-700 hover:text-white rounded-full font-semibold text-sm transition-all"
-                  >
-                    {t('bacaanPage.loadMore')}
-                  </button>
-                </div>
-              )}
-            </>
+            (() => {
+              const filtered = search
+                ? items.filter(item => {
+                    const title = lang === 'en' && item.title_en ? item.title_en : item.title_id
+                    return title.toLowerCase().includes(search.toLowerCase())
+                  })
+                : items
+              return (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filtered.length > 0 ? filtered.map((item, i) => (
+                      <SectionReveal key={item._id} delay={i * 0.05}>
+                        <BacaanCard item={item} category={category} />
+                      </SectionReveal>
+                    )) : (
+                      <div className="col-span-3 text-center py-16 text-gray-400 font-serif">{t('bacaanPage.noContent')}</div>
+                    )}
+                  </div>
+                  {!search && items.length < total && (
+                    <div className="text-center mt-10">
+                      <button
+                        onClick={loadMore}
+                        className="px-8 py-3 border-2 border-navy-700 text-navy-700 hover:bg-navy-700 hover:text-white rounded-full font-semibold text-sm transition-all"
+                      >
+                        {t('bacaanPage.loadMore')}
+                      </button>
+                    </div>
+                  )}
+                </>
+              )
+            })()
           ) : (
             <div className="text-center py-24">
-              <span className="text-6xl block mb-4">{meta.icon}</span>
+              <span className="flex justify-center mb-4">{meta.Icon && <meta.Icon size={56} className="text-gray-300" />}</span>
               <p className="font-serif text-2xl text-gray-400 mb-2">{t('bacaanPage.noContent')}</p>
               <p className="text-gray-400 text-sm">{t('bacaanPage.contentComingSoon')}</p>
             </div>

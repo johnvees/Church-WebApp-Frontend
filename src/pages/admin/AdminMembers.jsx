@@ -121,7 +121,7 @@ export function AdminMembersForm() {
     const fd = new FormData(); fd.append('photo', file)
     setUploading(true)
     try {
-      const { data } = await api.post('/members/upload-photo', fd)
+      const { data } = await api.upload('/members/upload-photo', fd)
       if (data.success) { setForm(p => ({ ...p, photo: data.url })); toast.success(t('admin.photoUploaded')) }
     } catch { toast.error(t('admin.uploadFailedShort')) } finally { setUploading(false) }
   }

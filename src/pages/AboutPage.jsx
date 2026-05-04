@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
-import { FiMapPin, FiPhone, FiMail, FiYoutube, FiInstagram, FiFacebook } from 'react-icons/fi'
+import { FiMapPin, FiPhone, FiMail, FiYoutube, FiInstagram, FiFacebook, FiEye, FiCompass, FiClock } from 'react-icons/fi'
 import Layout from '../components/layout/Layout'
 import SectionReveal from '../components/ui/SectionReveal'
 import api from '../utils/api'
 
 export default function AboutPage() {
-  const { t } = useTranslation()
-  const lang = localStorage.getItem('lang') || 'id'
+  const { t, i18n } = useTranslation()
+  const lang = i18n.language
   const [about, setAbout] = useState(null)
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function AboutPage() {
             <SectionReveal direction="left">
               <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 h-full">
                 <div className="w-12 h-12 bg-gold-100 rounded-2xl flex items-center justify-center mb-5">
-                  <span className="text-2xl">👁️</span>
+                  <FiEye className="text-gold-600" size={22} />
                 </div>
                 <h2 className="font-serif text-2xl font-bold text-navy-700 mb-4">{t('about.vision')}</h2>
                 <div className="w-10 h-0.5 bg-gold-400 mb-4" />
@@ -64,7 +64,7 @@ export default function AboutPage() {
             <SectionReveal direction="right" delay={0.1}>
               <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 h-full">
                 <div className="w-12 h-12 bg-navy-100 rounded-2xl flex items-center justify-center mb-5">
-                  <span className="text-2xl">🎯</span>
+                  <FiCompass className="text-navy-600" size={22} />
                 </div>
                 <h2 className="font-serif text-2xl font-bold text-navy-700 mb-4">{t('about.mission')}</h2>
                 <div className="w-10 h-0.5 bg-navy-400 mb-4" />
@@ -156,7 +156,7 @@ export default function AboutPage() {
             <SectionReveal delay={0.2}>
               <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/15">
                 <div className="w-10 h-10 bg-gold-500/20 rounded-xl flex items-center justify-center mb-4">
-                  <span className="text-gold-400 text-lg">⛪</span>
+                  <FiClock className="text-gold-400" size={18} />
                 </div>
                 <p className="text-gold-400 text-xs font-semibold uppercase tracking-widest mb-2">{t('aboutPage.serviceSchedule')}</p>
                 <p className="text-white/80 text-sm mb-5">{schedule}</p>

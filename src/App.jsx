@@ -8,6 +8,7 @@ import BacaanDetailPage from './pages/BacaanDetailPage'
 import StrukturPage from './pages/StrukturPage'
 import ActivityPage from './pages/ActivityPage'
 import ArticleDetailPage from './pages/ArticleDetailPage'
+import GalleryDetailPage from './pages/GalleryDetailPage'
 import AboutPage from './pages/AboutPage'
 
 // Admin pages
@@ -43,6 +44,7 @@ function AppRoutes() {
       <Route path="/struktur" element={<StrukturPage />} />
       <Route path="/activity" element={<ActivityPage />} />
       <Route path="/activity/artikel/:slug" element={<ArticleDetailPage />} />
+      <Route path="/activity/galeri/:id" element={<GalleryDetailPage />} />
       <Route path="/about" element={<AboutPage />} />
 
       {/* Admin - auth */}

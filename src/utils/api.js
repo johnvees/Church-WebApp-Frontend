@@ -2,8 +2,15 @@ import axios from 'axios'
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api',
-  timeout: 10000,
+  timeout: 15000,
 })
+
+// Use a longer timeout for file uploads
+api.upload = (url, formData, onProgress) =>
+  api.post(url, formData, {
+    timeout: 120000,
+    onUploadProgress: onProgress,
+  })
 
 // Attach JWT token
 api.interceptors.request.use((config) => {

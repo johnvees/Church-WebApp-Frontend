@@ -16,8 +16,8 @@ const BACAAN_KEYS = {
 
 export default function BacaanDetailPage() {
   const { category, slug } = useParams()
-  const { t } = useTranslation()
-  const lang = localStorage.getItem('lang') || 'id'
+  const { t, i18n } = useTranslation()
+  const lang = i18n.language
   const [item, setItem] = useState(null)
   const [loading, setLoading] = useState(true)
   const dateLocale = lang === 'en' ? enUS : idLocale

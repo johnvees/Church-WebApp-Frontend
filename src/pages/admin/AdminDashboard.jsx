@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
-import { FiBook, FiImage, FiUsers, FiFileText, FiArrowRight, FiFeather } from 'react-icons/fi'
+import { FiBook, FiImage, FiUsers, FiFileText, FiArrowRight, FiFeather, FiEye } from 'react-icons/fi'
 import AdminLayout from '../../components/layout/AdminLayout'
 import { useAuth } from '../../context/AuthContext'
 import api from '../../utils/api'
@@ -33,7 +33,7 @@ function StatCard({ icon: Icon, label, value, color, path, delay }) {
 export default function AdminDashboard() {
   const { t } = useTranslation()
   const { user, isAdmin } = useAuth()
-  const [stats, setStats] = useState({ articles: 0, bacaan: 0, members: 0, gallery: 0 })
+  const [stats, setStats] = useState({ articles: 0, bacaan: 0, members: 0, gallery: 0, views: 0 })
   const [recentArticles, setRecentArticles] = useState([])
 
   useEffect(() => {
@@ -43,11 +43,13 @@ export default function AdminDashboard() {
       api.get('/members/all').catch(() => ({ data: { data: [] } })),
       api.get('/gallery/admin/all').catch(() => ({ data: { data: [] } })),
     ]).then(([art, bac, mem, gal]) => {
+      const totalViews = (art.data.data || []).reduce((sum, a) => sum + (a.views || 0), 0)
       setStats({
         articles: art.data.data?.length || 0,
         bacaan: bac.data.data?.length || 0,
         members: mem.data.data?.length || 0,
         gallery: gal.data.data?.length || 0,
+        views: totalViews,
       })
       setRecentArticles(art.data.data?.slice(0, 5) || [])
     })
@@ -69,17 +71,18 @@ export default function AdminDashboard() {
         className="mb-8"
       >
         <p className="text-gray-400 text-sm mb-1">{greeting()},</p>
-        <h1 className="font-serif text-2xl font-bold text-navy-700">{user?.name} 👋</h1>
+        <h1 className="font-serif text-2xl font-bold text-navy-700">{user?.name}</h1>
         <p className="text-gray-400 text-sm mt-1 capitalize">Role: {user?.role}</p>
       </motion.div>
 
       {/* Stats */}
       {isAdmin && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
           <StatCard icon={FiFeather} label={t('admin.totalArticles')} value={stats.articles} color="bg-blue-500" path="/admin/articles" delay={0.1} />
           <StatCard icon={FiBook} label={t('admin.readingContent')} value={stats.bacaan} color="bg-emerald-500" path="/admin/bacaan" delay={0.2} />
           <StatCard icon={FiUsers} label={t('admin.orgMembers')} value={stats.members} color="bg-purple-500" path="/admin/members" delay={0.3} />
           <StatCard icon={FiImage} label={t('admin.galleryAlbums')} value={stats.gallery} color="bg-orange-500" path="/admin/gallery" delay={0.4} />
+          <StatCard icon={FiEye} label={t('admin.totalViews')} value={stats.views} color="bg-gold-500" path="/admin/articles" delay={0.5} />
         </div>
       )}
 

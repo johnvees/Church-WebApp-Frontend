@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi'
+import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowLeft } from 'react-icons/fi'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../context/AuthContext'
 import toast from 'react-hot-toast'
@@ -26,6 +26,12 @@ export default function AdminLoginPage() {
 
   return (
     <div className="min-h-screen bg-navy-900 flex items-center justify-center p-4 relative overflow-hidden">
+      <button
+        onClick={() => navigate('/')}
+        className="absolute top-6 left-6 z-10 flex items-center gap-2 text-white/40 hover:text-white/80 text-sm transition-colors"
+      >
+        <FiArrowLeft size={16} /> Back to site
+      </button>
       {/* Background */}
       <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 60%, rgba(201,168,76,0.08) 0%, transparent 70%)' }} />
       <div className="absolute inset-0 opacity-[0.03]" style={{

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { FiPlus, FiEdit2, FiTrash2, FiArrowLeft, FiSave } from 'react-icons/fi'
 import AdminLayout from '../../components/layout/AdminLayout'
 import { useAuth } from '../../context/AuthContext'
+import RichTextEditor from '../../components/ui/RichTextEditor'
 import api from '../../utils/api'
 import toast from 'react-hot-toast'
 
@@ -162,7 +163,7 @@ export function AdminBacaanForm() {
     const fd = new FormData(); fd.append('image', file)
     setUploading(true)
     try {
-      const { data } = await api.post('/bacaan/upload-image', fd)
+      const { data } = await api.upload('/bacaan/upload-image', fd)
       if (data.success) { setForm(p => ({ ...p, coverImage: data.url })); toast.success(t('admin.imageUploadedShort')) }
     } catch { toast.error(t('admin.uploadFailedShort')) } finally { setUploading(false) }
   }
@@ -172,7 +173,7 @@ export function AdminBacaanForm() {
     const fd = new FormData(); fd.append('document', file)
     setUploading(true)
     try {
-      const { data } = await api.post('/bacaan/upload-document', fd)
+      const { data } = await api.upload('/bacaan/upload-document', fd)
       if (data.success) { setForm(p => ({ ...p, fileUrl: data.url })); toast.success(t('admin.docUploaded')) }
     } catch { toast.error(t('admin.uploadFailedShort')) } finally { setUploading(false) }
   }
@@ -215,8 +216,22 @@ export function AdminBacaanForm() {
                 <div><label className={lbl}>{t('admin.excerptId')}</label><textarea className={inp} rows={3} value={form.excerpt_id} onChange={e => setForm({...form, excerpt_id: e.target.value})} /></div>
                 <div><label className={lbl}>{t('admin.excerptEn')}</label><textarea className={inp} rows={3} value={form.excerpt_en} onChange={e => setForm({...form, excerpt_en: e.target.value})} /></div>
               </div>
-              <div><label className={lbl}>{t('admin.contentId')}</label><textarea className={inp} rows={10} value={form.content_id} onChange={e => setForm({...form, content_id: e.target.value})} placeholder="Konten artikel..." /></div>
-              <div><label className={lbl}>{t('admin.contentEn')}</label><textarea className={inp} rows={10} value={form.content_en} onChange={e => setForm({...form, content_en: e.target.value})} /></div>
+              <div>
+                <label className={lbl}>{t('admin.contentId')}</label>
+                <RichTextEditor
+                  value={form.content_id}
+                  onChange={val => setForm(prev => ({ ...prev, content_id: val }))}
+                  placeholder="Mulai menulis konten (ID)..."
+                />
+              </div>
+              <div>
+                <label className={lbl}>{t('admin.contentEn')}</label>
+                <RichTextEditor
+                  value={form.content_en}
+                  onChange={val => setForm(prev => ({ ...prev, content_en: val }))}
+                  placeholder="Write content here (EN)..."
+                />
+              </div>
             </div>
           </div>
 

@@ -95,13 +95,48 @@ export function AdminGalleryForm() {
 
   const handlePhotos = async (e) => {
     const files = Array.from(e.target.files)
-    const fd = new FormData()
-    files.forEach(f => fd.append('photos', f))
+    if (!files.length) return
+
+    const oversized = files.filter(f => f.size > 10 * 1024 * 1024)
+    if (oversized.length) {
+      toast.error(`${oversized.length} file(s) exceed 10 MB limit`)
+      return
+    }
+
     setUploading(true)
     try {
-      await api.post(`/gallery/${id}/photos`, fd)
-      toast.success(`${files.length} ${t('admin.photosUploaded')}`); load()
-    } catch { toast.error(t('admin.uploadFailedShort')) } finally { setUploading(false) }
+      // Step 1: get signed upload credential
+      const { data: sign } = await api.get('/gallery/admin/sign-upload')
+      console.log('[upload] sign response:', sign)
+
+      // Step 2: upload directly to Cloudinary in parallel
+      const results = await Promise.all(files.map(async file => {
+        const fd = new FormData()
+        fd.append('file', file)
+        fd.append('api_key', sign.apiKey)
+        fd.append('timestamp', String(sign.timestamp))
+        fd.append('signature', sign.signature)
+        fd.append('folder', sign.folder)
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${sign.cloudName}/image/upload`, {
+          method: 'POST', body: fd,
+        })
+        const json = await res.json()
+        console.log('[upload] cloudinary result:', json)
+        return json
+      }))
+
+      const failed = results.filter(r => r.error)
+      if (failed.length) throw new Error('Cloudinary: ' + failed[0].error.message)
+
+      // Step 3: save URLs to backend
+      const photos = results.map(r => ({ url: r.secure_url, publicId: r.public_id }))
+      await api.post(`/gallery/${id}/photos/batch`, { photos })
+      toast.success(`${files.length} ${t('admin.photosUploaded')}`)
+      load()
+    } catch (err) {
+      console.error('[upload] error:', err)
+      toast.error(err.message || t('admin.uploadFailedShort'))
+    } finally { setUploading(false) }
   }
 
   const handleDeletePhoto = async (photoId) => {
@@ -274,7 +309,7 @@ export function AdminAboutPage() {
     const fd = new FormData(); fd.append('logo', file)
     setUploading(true)
     try {
-      const { data } = await api.post('/about/upload-logo', fd)
+      const { data } = await api.upload('/about/upload-logo', fd)
       if (data.success) { setForm(p => ({ ...p, logoUrl: data.url })); toast.success(t('admin.logoUploaded')) }
     } catch { toast.error(t('admin.uploadFailedShort')) } finally { setUploading(false) }
   }
